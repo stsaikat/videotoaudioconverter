@@ -15,12 +15,18 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        showSelectVideoFragment()
+        //showSelectVideoFragment()
+        showConvertInfoFragment()
     }
 
     fun showSelectVideoFragment() {
         val selectVideoFragment = SelectVideoFragment()
         showFragment(selectVideoFragment)
+    }
+
+    fun showConvertInfoFragment() {
+        val convertInfoFragment = ConvertInfoFragment()
+        showFragment(convertInfoFragment)
     }
 
     private fun showFragment(fragment: Fragment) {
