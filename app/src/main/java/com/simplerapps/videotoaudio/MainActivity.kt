@@ -1,5 +1,7 @@
 package com.simplerapps.videotoaudio
 
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -15,8 +17,7 @@ class MainActivity : AppCompatActivity() {
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        //showSelectVideoFragment()
-        showConvertInfoFragment()
+        showSelectVideoFragment()
     }
 
     fun showSelectVideoFragment() {
@@ -24,15 +25,25 @@ class MainActivity : AppCompatActivity() {
         showFragment(selectVideoFragment)
     }
 
-    fun showConvertInfoFragment() {
-        val convertInfoFragment = ConvertInfoFragment()
+    fun showConvertInfoFragment(uri: Uri) {
+        val convertInfoFragment = ConvertInfoFragment(uri)
         showFragment(convertInfoFragment)
     }
 
     private fun showFragment(fragment: Fragment) {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(viewBinding.fragmentContainer.id,fragment)
+            replace(viewBinding.fragmentContainer.id, fragment)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            val uri = data?.data
+            uri?.let {
+                showConvertInfoFragment(it)
+            }
         }
     }
 }
