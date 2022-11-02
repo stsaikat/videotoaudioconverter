@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.simplerapps.videotoaudio.databinding.ActivityMainBinding
@@ -20,14 +21,33 @@ class MainActivity : AppCompatActivity() {
         showSelectVideoFragment()
     }
 
-    fun showSelectVideoFragment() {
+    private fun showSelectVideoFragment() {
         val selectVideoFragment = SelectVideoFragment()
         showFragment(selectVideoFragment)
     }
 
-    fun showConvertInfoFragment(uri: Uri) {
-        val convertInfoFragment = ConvertInfoFragment(uri)
+    private fun showConvertInfoFragment(uri: Uri) {
+        val convertInfoFragmentOnClickListener = object : ConvertInfoFragment.OnClickListener {
+            override fun onClick(view: View) {
+                when(view.id) {
+                    R.id.bt_convert -> showConvertProcessFragment(uri)
+                }
+            }
+        }
+        val convertInfoFragment = ConvertInfoFragment(uri,convertInfoFragmentOnClickListener)
         showFragment(convertInfoFragment)
+    }
+
+    private fun showConvertProcessFragment(uri: Uri) {
+        val processFragmentListener = object : ConvertProcessFragment.Listener {
+            override fun onButtonClick(view: View) {
+                when(view.id) {
+                    R.id.ibt_home -> showSelectVideoFragment()
+                }
+            }
+        }
+        val convertProcessFragment = ConvertProcessFragment(uri,processFragmentListener)
+        showFragment(convertProcessFragment)
     }
 
     private fun showFragment(fragment: Fragment) {

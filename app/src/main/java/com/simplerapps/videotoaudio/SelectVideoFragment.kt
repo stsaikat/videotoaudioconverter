@@ -13,8 +13,26 @@ class SelectVideoFragment : Fragment(R.layout.fragment_select_video) {
 
         val selectVideoButton = view.findViewById<Button>(R.id.bt_select_video)
         selectVideoButton.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
-            startActivityForResult(intent,0)
+            pickVideo()
+            //pickAudio()
         }
+    }
+
+    private fun pickVideo() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI)
+        startActivityForResult(intent,0)
+    }
+
+    private fun pickAudio() {
+        val audioIntent = Intent();
+        audioIntent.type = "audio/*"
+        audioIntent.action = Intent.ACTION_OPEN_DOCUMENT
+        startActivityForResult(
+            Intent.createChooser(
+                audioIntent,
+                "Select Audio",
+            ),
+            1
+        )
     }
 }

@@ -8,12 +8,13 @@ import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 
-class ConvertInfoFragment(val uri: Uri) : Fragment(R.layout.fragment_convert_info) {
+class ConvertInfoFragment(private val uri: Uri,private val onClickListener: OnClickListener) : Fragment(R.layout.fragment_convert_info) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -38,6 +39,10 @@ class ConvertInfoFragment(val uri: Uri) : Fragment(R.layout.fragment_convert_inf
         thumb?.let {
             videoThumbImageView.setImageBitmap(it)
         }
+
+        view.findViewById<Button>(R.id.bt_convert).setOnClickListener {
+            onClickListener.onClick(it)
+        }
     }
 
     private fun getNameWithoutExtension(nameWithExt: String): String {
@@ -53,5 +58,9 @@ class ConvertInfoFragment(val uri: Uri) : Fragment(R.layout.fragment_convert_inf
         val fileName = nameIndex?.let { returnCursor.getString(it) }
         returnCursor?.close()
         return fileName
+    }
+
+    interface OnClickListener {
+        fun onClick(view: View)
     }
 }
