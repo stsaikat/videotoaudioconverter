@@ -3,8 +3,6 @@ package com.simplerapps.videotoaudio
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +10,9 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.simplerapps.videotoaudio.databinding.FragmentConvertProcessBinding
+import kotlinx.coroutines.*
 
 class ConvertProcessFragment(private val uri: Uri, private val listener: Listener) :
     Fragment(R.layout.fragment_convert_process), SeekBar.OnSeekBarChangeListener {
@@ -23,21 +23,24 @@ class ConvertProcessFragment(private val uri: Uri, private val listener: Listene
     private lateinit var viewBinding: FragmentConvertProcessBinding
     private val mediaPlayer = MediaPlayer()
     private var beforeMuteVolume = INITIAL_VOLUME
-    private val progressUpdateHandler = Handler(Looper.getMainLooper()) {
-        Log.d("xyz", "sdf : ${it.what}")
-        if (it.what == UPDATE_CURRENT_POS) {
-            if (mediaPlayer.isPlaying) {
-                viewBinding.sbCurrPos.progress = mediaPlayer.currentPosition
-                sendProgressHandlerUpdate()
+    private var observerWaitTime = 500L
+
+    private fun setProgressUpdateObserver() {
+        lifecycleScope.launch {
+            while (true) {
+                if (mediaPlayer.isPlaying) {
+                    viewBinding.sbCurrPos.progress = mediaPlayer.currentPosition
+                    withContext(Dispatchers.Main) {
+                        "${convertSecondsToHMmSs(mediaPlayer.currentPosition / 1000)}/${
+                            convertSecondsToHMmSs(
+                                mediaPlayer.duration / 1000
+                            )
+                        }".also { viewBinding.tvPlayProgressTime.text = it }
+                    }
+                }
+                delay(observerWaitTime)
             }
         }
-        return@Handler true
-    }
-
-    private fun sendProgressHandlerUpdate() {
-        progressUpdateHandler.postDelayed({
-            UPDATE_CURRENT_POS
-        }, 250)
     }
 
     override fun onCreateView(
@@ -56,6 +59,8 @@ class ConvertProcessFragment(private val uri: Uri, private val listener: Listene
         setViewListeners()
 
         setMediaPlayer(uri)
+
+        setProgressUpdateObserver()
     }
 
     private fun setViewListeners() {
@@ -76,7 +81,6 @@ class ConvertProcessFragment(private val uri: Uri, private val listener: Listene
             mediaPlayer.seekTo(0)
             mediaPlayer.start()
             setPlayPauseViews()
-            sendProgressHandlerUpdate()
         }
         viewBinding.ibtMute.setOnClickListener {
             if (viewBinding.sbVolume.progress == 0) {
@@ -140,8 +144,12 @@ class ConvertProcessFragment(private val uri: Uri, private val listener: Listene
             it.start()
             viewBinding.sbCurrPos.max = it.duration
             setPlayPauseViews()
-            sendProgressHandlerUpdate()
             viewBinding.sbVolume.progress = INITIAL_VOLUME
+        }
+
+        mediaPlayer.setOnCompletionListener {
+            setPlayPauseViews()
+            viewBinding.sbCurrPos.progress = 0
         }
         mediaPlayer.setScreenOnWhilePlaying(true)
         mediaPlayer.prepare()
@@ -155,12 +163,10 @@ class ConvertProcessFragment(private val uri: Uri, private val listener: Listene
         seekBar?.let {
             when (it.id) {
                 viewBinding.sbVolume.id -> {
-                    Log.d("xyz", "onProgressChanged: $progress")
                     setVolumeViews()
                     mediaPlayer.setVolume(progress / 100f, progress / 100f)
                 }
                 viewBinding.sbCurrPos.id -> {
-                    Log.d("xyz", "onProgressChanged: $progress")
                     if (isUser) {
                         mediaPlayer.seekTo(progress)
                     }
@@ -170,11 +176,23 @@ class ConvertProcessFragment(private val uri: Uri, private val listener: Listene
     }
 
     override fun onStartTrackingTouch(seekBar: SeekBar?) {
-
+        seekBar?.let {
+            when (it.id) {
+                viewBinding.sbCurrPos.id -> {
+                    observerWaitTime = 50L
+                }
+            }
+        }
     }
 
     override fun onStopTrackingTouch(seekBar: SeekBar?) {
-
+        seekBar?.let {
+            when (it.id) {
+                viewBinding.sbCurrPos.id -> {
+                    observerWaitTime = 500L
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
