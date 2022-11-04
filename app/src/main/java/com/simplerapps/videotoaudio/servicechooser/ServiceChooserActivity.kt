@@ -37,13 +37,11 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
         viewBinding.rvServices.adapter = serviceAdapter
     }
 
-    // TODO: fake list here. should be changed to original list
     private fun getServicesList() = arrayListOf(
         Service.VIDEO_TO_AUDIO,
-        Service.VIDEO_TO_AUDIO,
-        Service.VIDEO_TO_AUDIO,
-        Service.VIDEO_TO_AUDIO,
-        Service.VIDEO_TO_AUDIO
+        Service.EDIT_AUDIO,
+        Service.MERGE_AUDIO,
+        Service.MY_FOLDER
     )
 
     override fun onItemClick(service: Service) {

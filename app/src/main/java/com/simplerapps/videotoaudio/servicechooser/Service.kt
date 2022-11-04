@@ -8,5 +8,17 @@ enum class Service(
     VIDEO_TO_AUDIO(
         serviceName = "Convert Video To Audio",
         serviceId = 0
+    ),
+    EDIT_AUDIO(
+        serviceName = "Edit Audio",
+        serviceId = 1
+    ),
+    MERGE_AUDIO(
+        serviceName = "Merge Audio",
+        serviceId = 2
+    ),
+    MY_FOLDER(
+        serviceName = "My Folder",
+        serviceId = 3
     );
 }

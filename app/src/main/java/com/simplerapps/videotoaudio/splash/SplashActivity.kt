@@ -16,6 +16,8 @@ class SplashActivity : AppCompatActivity() {
         viewBinding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
+        supportActionBar?.hide()
+
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this,ServiceChooserActivity::class.java)
             startActivity(intent)
