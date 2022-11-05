@@ -21,4 +21,13 @@ enum class Service(
         serviceName = "My Folder",
         serviceId = 3
     );
+
+    companion object {
+        fun getServiceById(id: Int) : Service? {
+            values().forEach {
+                if (it.serviceId == id) return it
+            }
+            return null
+        }
+    }
 }

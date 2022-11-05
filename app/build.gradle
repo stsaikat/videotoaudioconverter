@@ -50,4 +50,6 @@ dependencies {
 
     def coroutine_version = "1.6.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
+
+    implementation "com.google.android.exoplayer:exoplayer:2.18.1"
 }
