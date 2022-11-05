@@ -3,6 +3,7 @@ package com.simplerapps.videotoaudio.service
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.*
@@ -14,6 +15,7 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.simplerapps.videotoaudio.LogD
 import com.simplerapps.videotoaudio.R
+import java.io.File
 
 class VideoToAudioInfoFragment(private val uri: String) :
     Fragment(R.layout.fragment_video_to_audio_info), Player.Listener {
@@ -30,11 +32,34 @@ class VideoToAudioInfoFragment(private val uri: String) :
         super.onViewCreated(view, savedInstanceState)
 
         playerView = view.findViewById(R.id.exo_video_player)
+
+        view.findViewById<Button>(R.id.bt_convert).setOnClickListener {
+            val outFile =
+                File(requireContext().applicationContext.cacheDir.absolutePath + "/temp.m4a")
+            val outUri = Uri.fromFile(outFile)
+
+            val videoToAudioConverter = VideoToAudioConverter(
+                requireContext(),
+                Uri.parse(uri),
+                outUri,
+                object : VideoToAudioConverter.Listener {
+                    override fun onProgress(progress: Int) {
+
+                    }
+
+                    override fun onFinish() {
+                        initializePlayer(outUri.toString())
+                    }
+                }
+            )
+
+            videoToAudioConverter.convert()
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        initializePlayer()
+        initializePlayer(uri)
     }
 
     override fun onStop() {
@@ -42,7 +67,7 @@ class VideoToAudioInfoFragment(private val uri: String) :
         releasePlayer()
     }
 
-    private fun initializePlayer() {
+    private fun initializePlayer(uri: String) {
         exoplayer = ExoPlayer.Builder(requireContext()).build()
         val mediaItem = MediaItem.fromUri(uri)
         exoplayer.addMediaItem(mediaItem)
@@ -78,7 +103,7 @@ class VideoToAudioInfoFragment(private val uri: String) :
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
         LogD("${error.message}")
-        Toast.makeText(requireContext(),"Can't play the video",Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Can't play the video", Toast.LENGTH_SHORT).show()
     }
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
