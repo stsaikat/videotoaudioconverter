@@ -1,5 +1,6 @@
 package com.simplerapps.videotoaudio.service
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -15,9 +16,11 @@ import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.simplerapps.videotoaudio.LogD
 import com.simplerapps.videotoaudio.R
+import com.simplerapps.videotoaudio.service.InfoActivity.Companion.CONTENT_URI
+import com.simplerapps.videotoaudio.share.ShareActivity
 import java.io.File
 
-class VideoToAudioInfoFragment(private val uri: String) :
+class VideoToAudioInfoFragment(private val uri: String,private val listener: Listener) :
     Fragment(R.layout.fragment_video_to_audio_info), Player.Listener {
 
     private lateinit var exoplayer: ExoPlayer
@@ -34,26 +37,8 @@ class VideoToAudioInfoFragment(private val uri: String) :
         playerView = view.findViewById(R.id.exo_video_player)
 
         view.findViewById<Button>(R.id.bt_convert).setOnClickListener {
-            val outFile =
-                File(requireContext().applicationContext.cacheDir.absolutePath + "/temp.m4a")
-            val outUri = Uri.fromFile(outFile)
-
-            val videoToAudioConverter = VideoToAudioConverter(
-                requireContext(),
-                Uri.parse(uri),
-                outUri,
-                object : VideoToAudioConverter.Listener {
-                    override fun onProgress(progress: Int) {
-
-                    }
-
-                    override fun onFinish() {
-                        initializePlayer(outUri.toString())
-                    }
-                }
-            )
-
-            videoToAudioConverter.convert()
+            exoplayer.pause()
+            listener.convertVideoToAudio(uri)
         }
     }
 
@@ -108,5 +93,9 @@ class VideoToAudioInfoFragment(private val uri: String) :
 
     override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
         super.onPlayerStateChanged(playWhenReady, playbackState)
+    }
+
+    interface Listener {
+        fun convertVideoToAudio(uri: String)
     }
 }

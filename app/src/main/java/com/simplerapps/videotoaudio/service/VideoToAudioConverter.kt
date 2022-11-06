@@ -65,6 +65,9 @@ class VideoToAudioConverter(
             muxer.writeSampleData(muxerIndex, buffer, bufferInfo)
 
             extractor.advance()
+
+            // FIXME: should be removed. added for testing
+            Thread.sleep(5)
         }
 
         release()
@@ -76,7 +79,7 @@ class VideoToAudioConverter(
         muxer.release()
         extractor.release()
 
-        listener.onFinish()
+        listener.onFinish(outputUri.toString())
 
         LogD("success")
     }
@@ -86,6 +89,6 @@ class VideoToAudioConverter(
          * get progress from 0 to 100
          */
         fun onProgress(progress: Int)
-        fun onFinish()
+        fun onFinish(uri: String)
     }
 }
