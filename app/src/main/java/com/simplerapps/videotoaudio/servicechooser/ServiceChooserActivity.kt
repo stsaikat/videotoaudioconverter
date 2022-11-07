@@ -49,9 +49,9 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
 
     private fun getServicesList() = arrayListOf(
         Service.VIDEO_TO_AUDIO,
-        Service.EDIT_AUDIO,
+/*        Service.EDIT_AUDIO,
         Service.MERGE_AUDIO,
-        Service.MY_FOLDER
+        Service.MY_FOLDER*/
     )
 
     override fun onItemClick(service: Service) {
@@ -59,9 +59,15 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
             Service.VIDEO_TO_AUDIO -> {
                 pickVideo()
             }
-            Service.EDIT_AUDIO -> TODO()
-            Service.MERGE_AUDIO -> TODO()
-            Service.MY_FOLDER -> TODO()
+            Service.EDIT_AUDIO -> {
+
+            }
+            Service.MERGE_AUDIO -> {
+
+            }
+            Service.MY_FOLDER -> {
+
+            }
         }
     }
 

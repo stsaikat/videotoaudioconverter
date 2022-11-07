@@ -92,6 +92,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
                         val intent = Intent(this@InfoActivity, ShareActivity::class.java)
                         intent.putExtra(CONTENT_URI,uri)
                         startActivity(intent)
+                        finish()
                     }
                 }
             )
