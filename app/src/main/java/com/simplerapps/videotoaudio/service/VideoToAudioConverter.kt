@@ -35,6 +35,7 @@ class VideoToAudioConverter(
             val format = extractor.getTrackFormat(i)
             val mimeType = format.getString(MediaFormat.KEY_MIME)!!
             if (mimeType.startsWith("audio/")) {
+                LogD("$mimeType")
                 extractor.selectTrack(i)
                 trackNo = i
                 durationUs = format.getLong(MediaFormat.KEY_DURATION)
