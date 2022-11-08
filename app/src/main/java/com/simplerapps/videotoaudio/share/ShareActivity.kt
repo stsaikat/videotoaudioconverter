@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.net.toUri
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -24,7 +25,7 @@ import java.io.File
 class ShareActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityShareBinding
     private lateinit var exoplayer: ExoPlayer
-    private lateinit  var uri: String
+    private lateinit var uri: String
     private var alreadySaved = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,12 +57,12 @@ class ShareActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.share_screen_menu,menu)
+        menuInflater.inflate(R.menu.share_screen_menu, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when(item.itemId) {
+        return when (item.itemId) {
             R.id.home -> {
                 goToHomeScreen()
                 true
@@ -71,26 +72,26 @@ class ShareActivity : AppCompatActivity() {
     }
 
     private fun goToHomeScreen() {
-        val intent = Intent(this,ServiceChooserActivity::class.java)
+        val intent = Intent(this, ServiceChooserActivity::class.java)
         startActivity(intent)
         finishAffinity()
     }
 
     private fun saveToExternalStorage(uri: String?) {
         if (uri == null) {
-            Toast.makeText(this,"No files to save!", Toast.LENGTH_SHORT).show()
+            showInfoDialog("No files to save!")
             return
         }
 
         if (alreadySaved) {
-            Toast.makeText(this,"Already saved!", Toast.LENGTH_SHORT).show()
+            showInfoDialog("Already saved!")
             return
         }
 
         val externalUri = getExternalOutUri()
 
         if (externalUri == null) {
-            Toast.makeText(this,"Failed to save!", Toast.LENGTH_SHORT).show()
+            showInfoDialog("Failed to save!")
             return
         }
 
@@ -100,14 +101,14 @@ class ShareActivity : AppCompatActivity() {
             }
         }
 
-        Toast.makeText(this,"Saved Successfully!", Toast.LENGTH_SHORT).show()
-
+        showInfoDialog("Saved Successfully!")
         alreadySaved = true
     }
 
-    private fun getExternalOutUri() : Uri? {
+    private fun getExternalOutUri(): Uri? {
 
-        val fileName = "VideoToAudioConverter${getDateTimeFromMillis(System.currentTimeMillis())}.m4a"
+        val fileName =
+            "VideoToAudioConverter${getDateTimeFromMillis(System.currentTimeMillis())}.m4a"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val contentValues = ContentValues().apply {
@@ -119,13 +120,19 @@ class ShareActivity : AppCompatActivity() {
             return contentResolver.insert(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues
             )
-        }
-        else {
+        } else {
             val file = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC),fileName
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), fileName
             )
 
             return file.toUri()
         }
+    }
+
+    private fun showInfoDialog(info: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage(info)
+        builder.setPositiveButton("Ok", null)
+        builder.create().show()
     }
 }
