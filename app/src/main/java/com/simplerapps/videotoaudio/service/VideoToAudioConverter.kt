@@ -8,6 +8,7 @@ import android.media.MediaMuxer
 import android.net.Uri
 import android.os.Build
 import com.simplerapps.videotoaudio.LogD
+import com.simplerapps.videotoaudio.common.FileInfoManager
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 
@@ -35,7 +36,7 @@ class VideoToAudioConverter(
             val format = extractor.getTrackFormat(i)
             val mimeType = format.getString(MediaFormat.KEY_MIME)!!
             if (mimeType.startsWith("audio/")) {
-                LogD("$mimeType")
+                FileInfoManager.mimeType = mimeType
                 extractor.selectTrack(i)
                 trackNo = i
                 durationUs = format.getLong(MediaFormat.KEY_DURATION)
@@ -43,11 +44,7 @@ class VideoToAudioConverter(
             }
         }
 
-        muxer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-        } else {
-            MediaMuxer(outputUri.path!!, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-        }
+        muxer = MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
 
         val bufferInfo = MediaCodec.BufferInfo()
         bufferInfo.offset = 0

@@ -1,15 +1,15 @@
 package com.simplerapps.videotoaudio.servicechooser
 
 import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
+import android.provider.OpenableColumns
 import androidx.recyclerview.widget.GridLayoutManager
-import com.simplerapps.videotoaudio.LogD
+import com.simplerapps.videotoaudio.common.FileInfoManager
 import com.simplerapps.videotoaudio.databinding.ActivityServiceChooserBinding
 import com.simplerapps.videotoaudio.service.InfoActivity
-import com.simplerapps.videotoaudio.service.InfoActivity.Companion.CONTENT_URI
 import com.simplerapps.videotoaudio.service.InfoActivity.Companion.SERVICE_ID
 
 class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickListener {
@@ -55,7 +55,7 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
     )
 
     override fun onItemClick(service: Service) {
-        when(service) {
+        when (service) {
             Service.VIDEO_TO_AUDIO -> {
                 pickVideo()
             }
@@ -79,15 +79,32 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == RESULT_OK) {
-            val intent = Intent(this,InfoActivity::class.java)
-            intent.putExtra(CONTENT_URI,data!!.data.toString())
             when(requestCode) {
                 VIDEO_REQUEST_CODE -> {
-                    intent.putExtra(SERVICE_ID,Service.VIDEO_TO_AUDIO.serviceId)
+                    data?.let { intent ->
+                        intent.data?.let {
+                            processChosenVideoUri(it)
+                        }
+                    }
                 }
             }
-
-            startActivity(intent)
         }
+    }
+
+    private fun processChosenVideoUri(uri: Uri) {
+        FileInfoManager.fileUri = uri
+        contentResolver.query(uri, null, null, null, null)?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+
+            it.moveToFirst()
+
+            FileInfoManager.fileName = it.getString(nameIndex)
+            FileInfoManager.fileSize = it.getLong(sizeIndex)
+        }
+
+        val intent = Intent(this, InfoActivity::class.java)
+        intent.putExtra(SERVICE_ID, Service.VIDEO_TO_AUDIO.serviceId)
+        startActivity(intent)
     }
 }

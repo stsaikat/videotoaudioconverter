@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.simplerapps.videotoaudio"
-        minSdk 23
+        minSdk 29
         targetSdk 33
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

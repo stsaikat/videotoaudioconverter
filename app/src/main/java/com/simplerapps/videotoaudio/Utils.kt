@@ -21,3 +21,14 @@ fun getDateTimeFromMillis(millis: Long): String {
     calendar.timeInMillis = millis
     return formatter.format(calendar.time)
 }
+
+fun getFileNameSerial() : String {
+    val millis = System.currentTimeMillis()
+
+    val dateFormat = "yyMMddHHmm"
+    val formatter = SimpleDateFormat(dateFormat, Locale.getDefault())
+    val calendar = Calendar.getInstance()
+
+    calendar.timeInMillis = millis
+    return formatter.format(calendar.time)
+}

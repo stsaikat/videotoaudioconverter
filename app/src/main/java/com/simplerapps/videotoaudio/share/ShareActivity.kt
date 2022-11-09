@@ -3,26 +3,27 @@ package com.simplerapps.videotoaudio.share
 import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.core.net.toUri
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.simplerapps.videotoaudio.R
+import com.simplerapps.videotoaudio.common.FileInfoManager
 import com.simplerapps.videotoaudio.databinding.ActivityShareBinding
-import com.simplerapps.videotoaudio.getDateTimeFromMillis
+import com.simplerapps.videotoaudio.getFileNameSerial
 import com.simplerapps.videotoaudio.service.InfoActivity.Companion.CONTENT_URI
 import com.simplerapps.videotoaudio.servicechooser.ServiceChooserActivity
-import java.io.File
 
 class ShareActivity : AppCompatActivity() {
+
+    companion object {
+        const val ALREADY_SAVED = "already_saved"
+    }
+
     private lateinit var viewBinding: ActivityShareBinding
     private lateinit var exoplayer: ExoPlayer
     private lateinit var uri: String
@@ -32,6 +33,10 @@ class ShareActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityShareBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
+        savedInstanceState?.let {
+            alreadySaved = it.getBoolean(ALREADY_SAVED)
+        }
 
         uri = intent.getStringExtra(CONTENT_URI)!!
 
@@ -47,8 +52,19 @@ class ShareActivity : AppCompatActivity() {
         }
 
         viewBinding.btSaveToStorage.setOnClickListener {
+            exoplayer.pause()
             saveToExternalStorage(uri)
         }
+
+        viewBinding.btShare.setOnClickListener {
+            exoplayer.pause()
+            onShareClick()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(ALREADY_SAVED, alreadySaved)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onStop() {
@@ -88,7 +104,8 @@ class ShareActivity : AppCompatActivity() {
             return
         }
 
-        val externalUri = getExternalOutUri()
+        val externalName = getToSaveName()
+        val externalUri = getExternalOutUri(externalName)
 
         if (externalUri == null) {
             showInfoDialog("Failed to save!")
@@ -101,38 +118,57 @@ class ShareActivity : AppCompatActivity() {
             }
         }
 
-        showInfoDialog("Saved Successfully!")
+        FileInfoManager.savedFileUri = externalUri
+        FileInfoManager.savedFileName = externalName
+
+        showInfoDialog(
+            title = "Saved Successfully!",
+            message = "Saved To \"storage/Music/${FileInfoManager.savedFileName}\""
+        )
         alreadySaved = true
     }
 
-    private fun getExternalOutUri(): Uri? {
+    private fun getExternalOutUri(name: String): Uri? {
 
-        val fileName =
-            "VideoToAudioConverter${getDateTimeFromMillis(System.currentTimeMillis())}.m4a"
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val contentValues = ContentValues().apply {
-                put(MediaStore.MediaColumns.DISPLAY_NAME, fileName)
-                put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp4a")
-                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_MUSIC)
-            }
-
-            return contentResolver.insert(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues
-            )
-        } else {
-            val file = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), fileName
-            )
-
-            return file.toUri()
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, FileInfoManager.mimeType)
+            put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_MUSIC)
         }
+
+        return contentResolver.insert(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, contentValues
+        )
     }
 
-    private fun showInfoDialog(info: String) {
-        val builder = AlertDialog.Builder(this)
-        builder.setMessage(info)
-        builder.setPositiveButton("Ok", null)
-        builder.create().show()
+    private fun onShareClick() {
+
+        if (FileInfoManager.savedFileUri == null) {
+            showInfoDialog(
+                title = "Please save before share!",
+                message = "click on the \"SAVE TO STORAGE\" button to save."
+            )
+
+            return
+        }
+
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "audio/*"
+        intent.putExtra(Intent.EXTRA_STREAM, FileInfoManager.savedFileUri)
+        startActivity(Intent.createChooser(intent, "Share ${FileInfoManager.savedFileName} using"))
+    }
+
+    private fun getToSaveName(): String {
+        var name = "Audio_Converter${getFileNameSerial()}.m4a"
+        FileInfoManager.fileName?.let {
+            name = "${it}_${name}"
+        }
+
+        return name
+    }
+
+    private fun showInfoDialog(title: String? = null, message: String? = null) {
+        val processResultDialog = ProcessResultDialog(title, message)
+        processResultDialog.show(supportFragmentManager, null)
     }
 }

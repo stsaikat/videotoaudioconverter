@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.simplerapps.videotoaudio.LogD
 import com.simplerapps.videotoaudio.R
+import com.simplerapps.videotoaudio.common.FileInfoManager
 import com.simplerapps.videotoaudio.databinding.ActivityInfoBinding
 import com.simplerapps.videotoaudio.servicechooser.Service
 import com.simplerapps.videotoaudio.share.ShareActivity
@@ -29,14 +30,14 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
         viewBinding = ActivityInfoBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        val serviceId = intent.getIntExtra(SERVICE_ID,-1)
+        val serviceId = intent.getIntExtra(SERVICE_ID, -1)
         val service = Service.getServiceById(serviceId)
 
-        when(service) {
+        when (service) {
             Service.VIDEO_TO_AUDIO -> {
-                showVideoToAudioFragment(
-                    intent.getStringExtra(CONTENT_URI)
-                )
+                FileInfoManager.fileUri?.let {
+                    showVideoToAudioFragment(it.toString())
+                }
             }
             Service.EDIT_AUDIO -> {
 
@@ -54,9 +55,8 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
     }
 
     private fun showVideoToAudioFragment(uri: String?) {
-        LogD("$uri")
         uri?.let {
-            val videoToAudioInfoFragment = VideoToAudioInfoFragment(it,this)
+            val videoToAudioInfoFragment = VideoToAudioInfoFragment(it, this)
             showFragment(videoToAudioInfoFragment)
         }
     }
@@ -70,12 +70,12 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
 
     override fun convertVideoToAudio(uri: String) {
         val convertProgressDialog = ConvertProgressDialog()
-        convertProgressDialog.show(supportFragmentManager,null)
+        convertProgressDialog.show(supportFragmentManager, null)
         convertProgressDialog.isCancelable = false
 
         thread(start = true) {
             val outFile =
-                File(applicationContext.cacheDir.absolutePath + "/temp.m4a")
+                File(applicationContext.cacheDir.absolutePath + FileInfoManager.cacheName)
             val outUri = Uri.fromFile(outFile)
 
             val videoToAudioConverter = VideoToAudioConverter(
@@ -90,7 +90,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
                     override fun onFinish(uri: String) {
                         convertProgressDialog.dismiss()
                         val intent = Intent(this@InfoActivity, ShareActivity::class.java)
-                        intent.putExtra(CONTENT_URI,uri)
+                        intent.putExtra(CONTENT_URI, uri)
                         startActivity(intent)
                         finish()
                     }
