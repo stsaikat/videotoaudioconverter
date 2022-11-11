@@ -8,8 +8,12 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simplerapps.phonic.R
+import com.simplerapps.phonic.repository.AudioFileModel
 
-class MyFolderRecyclerViewAdapter : RecyclerView.Adapter<MyFolderRecyclerViewAdapter.ViewHolder>() {
+class MyFolderRecyclerViewAdapter(
+    private val list: ArrayList<AudioFileModel>,
+    private val listener: OnItemClickListener
+) : RecyclerView.Adapter<MyFolderRecyclerViewAdapter.ViewHolder>() {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val nameTextView: TextView = view.findViewById(R.id.tv_audio_item_name)
@@ -21,15 +25,22 @@ class MyFolderRecyclerViewAdapter : RecyclerView.Adapter<MyFolderRecyclerViewAda
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             LayoutInflater.from(parent.context).inflate(
-                R.layout.item_my_audio_element,parent,false
+                R.layout.item_my_audio_element, parent, false
             )
         )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
+        val audioFileModel = list[position]
+        holder.nameTextView.text = audioFileModel.displayName
+        holder.shareButton.setOnClickListener {
+            listener.onItemClick(audioFileModel)
+        }
     }
 
-    override fun getItemCount(): Int = 100
+    override fun getItemCount(): Int = list.size
 
+    interface OnItemClickListener {
+        fun onItemClick(audioFileModel: AudioFileModel)
+    }
 }

@@ -15,6 +15,8 @@ import com.simplerapps.phonic.R
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityShareBinding
 import com.simplerapps.phonic.getFileNameSerial
+import com.simplerapps.phonic.repository.AudioFileModel
+import com.simplerapps.phonic.repository.MyFolderRepo
 import com.simplerapps.phonic.service.InfoActivity.Companion.CONTENT_URI
 import com.simplerapps.phonic.servicechooser.ServiceChooserActivity
 import com.simplerapps.phonic.shareAudioFile
@@ -30,6 +32,7 @@ class ShareActivity : AppCompatActivity() {
     private lateinit var exoplayer: ExoPlayer
     private lateinit var uri: String
     private var alreadySaved = false
+    private lateinit var myFolderRepo: MyFolderRepo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +65,8 @@ class ShareActivity : AppCompatActivity() {
             exoplayer.pause()
             onShareClick()
         }
+
+        myFolderRepo = MyFolderRepo(applicationContext)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -131,6 +136,19 @@ class ShareActivity : AppCompatActivity() {
             message = "Saved To \"storage/Music/${FileInfoManager.savedFileName}\""
         )
         alreadySaved = true
+
+        addToMyFolderList(
+            AudioFileModel(
+                uri = FileInfoManager.savedFileUri.toString(),
+                displayName = FileInfoManager.savedFileName
+            )
+        )
+    }
+
+    private fun addToMyFolderList(audioFileModel: AudioFileModel) {
+        myFolderRepo.addToAudioList(
+            audioFileModel
+        )
     }
 
     private fun getExternalOutUri(name: String): Uri? {
