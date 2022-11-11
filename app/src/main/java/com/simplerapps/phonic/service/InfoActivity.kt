@@ -80,7 +80,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
             val outUri = Uri.fromFile(outFile)
 
             val videoToAudioConverter = VideoToAudioConverter(
-                this,
+                this.applicationContext,
                 Uri.parse(uri),
                 outUri,
                 object : VideoToAudioConverter.Listener {
