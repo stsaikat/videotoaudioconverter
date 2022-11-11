@@ -50,8 +50,8 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
     private fun getServicesList() = arrayListOf(
         Service.VIDEO_TO_AUDIO,
 /*        Service.EDIT_AUDIO,
-        Service.MERGE_AUDIO,
-        Service.MY_FOLDER*/
+        Service.MERGE_AUDIO,*/
+        Service.MY_FOLDER
     )
 
     override fun onItemClick(service: Service) {
@@ -66,7 +66,7 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
 
             }
             Service.MY_FOLDER -> {
-
+                goToInfoActivity(Service.MY_FOLDER)
             }
         }
     }
@@ -104,8 +104,12 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
             FileInfoManager.fileSize = it.getLong(sizeIndex)
         }
 
+        goToInfoActivity(Service.VIDEO_TO_AUDIO)
+    }
+
+    private fun goToInfoActivity(withService: Service) {
         val intent = Intent(this, InfoActivity::class.java)
-        intent.putExtra(SERVICE_ID, Service.VIDEO_TO_AUDIO.serviceId)
+        intent.putExtra(SERVICE_ID, withService.serviceId)
         startActivity(intent)
     }
 }

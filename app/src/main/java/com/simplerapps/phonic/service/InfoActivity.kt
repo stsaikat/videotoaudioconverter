@@ -27,9 +27,8 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
         setContentView(viewBinding.root)
 
         val serviceId = intent.getIntExtra(SERVICE_ID, -1)
-        val service = Service.getServiceById(serviceId)
 
-        when (service) {
+        when (Service.getServiceById(serviceId)) {
             Service.VIDEO_TO_AUDIO -> {
                 FileInfoManager.fileUri?.let {
                     showVideoToAudioFragment(it.toString())
@@ -42,7 +41,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
 
             }
             Service.MY_FOLDER -> {
-
+                showMyFolderFragment()
             }
             null -> {
 
@@ -55,6 +54,11 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
             val videoToAudioInfoFragment = VideoToAudioInfoFragment(it, this)
             showFragment(videoToAudioInfoFragment)
         }
+    }
+
+    private fun showMyFolderFragment() {
+        val myFolderFragment = MyFolderFragment()
+        showFragment(myFolderFragment)
     }
 
     private fun showFragment(fragment: Fragment) {

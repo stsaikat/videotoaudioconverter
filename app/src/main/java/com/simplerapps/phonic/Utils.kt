@@ -1,5 +1,7 @@
 package com.simplerapps.phonic
 
+import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import java.text.SimpleDateFormat
 import java.util.*
