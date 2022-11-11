@@ -17,7 +17,9 @@ import com.simplerapps.phonic.databinding.ActivityShareBinding
 import com.simplerapps.phonic.getFileNameSerial
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
+import com.simplerapps.phonic.service.InfoActivity
 import com.simplerapps.phonic.service.InfoActivity.Companion.CONTENT_URI
+import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.servicechooser.ServiceChooserActivity
 import com.simplerapps.phonic.shareAudioFile
 import com.simplerapps.phonic.showInfoDialog
@@ -92,12 +94,23 @@ class ShareActivity : AppCompatActivity() {
                 goToHomeScreen()
                 true
             }
+            R.id.my_folder -> {
+                goToMyFolderScreen()
+                true
+            }
             else -> false
         }
     }
 
     private fun goToHomeScreen() {
         val intent = Intent(this, ServiceChooserActivity::class.java)
+        startActivity(intent)
+        finishAffinity()
+    }
+
+    private fun goToMyFolderScreen() {
+        val intent = Intent(this, InfoActivity::class.java)
+        intent.putExtra(InfoActivity.SERVICE_ID, Service.MY_FOLDER.serviceId)
         startActivity(intent)
         finishAffinity()
     }
@@ -187,9 +200,4 @@ class ShareActivity : AppCompatActivity() {
 
         return name
     }
-
-/*    private fun showInfoDialog(title: String? = null, message: String? = null) {
-        val processResultDialog = ProcessResultDialog(title, message)
-        processResultDialog.show(supportFragmentManager, null)
-    }*/
 }

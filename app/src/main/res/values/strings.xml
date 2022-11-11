@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Phonic</string>
     <string name="home">home</string>
+    <string name="my_folder">My Folder</string>
 </resources>
