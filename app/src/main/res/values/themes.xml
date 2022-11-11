@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.VideoToAudioConverter" parent="Theme.MaterialComponents.Light.Bridge">
+    <style name="Theme.Phonic" parent="Theme.MaterialComponents.Light.Bridge">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/slate_blue</item>
         <item name="colorPrimaryVariant">@color/dark_slate_blue</item>
