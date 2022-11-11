@@ -9,10 +9,20 @@
         android:id="@+id/rv_my_folder"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/my_folder_player"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/item_my_audio_element" />
+        tools:listitem="@layout/item_my_audio_element"
+        android:requiresFadingEdge="vertical"/>
+
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/my_folder_player"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:background="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

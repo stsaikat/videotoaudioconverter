@@ -10,4 +10,5 @@
     
     <color name="slate_blue">#FF6A5ACD</color>
     <color name="dark_slate_blue">#FF483D8B</color>
+    <color name="color_active">#FF4FFCEB</color>
 </resources>

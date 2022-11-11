@@ -87,11 +87,6 @@ class VideoToAudioInfoFragment(private val uri: String,private val listener: Lis
         Toast.makeText(requireContext(), "Can't play the video", Toast.LENGTH_SHORT).show()
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        super.onPlayerStateChanged(playWhenReady, playbackState)
-    }
-
     interface Listener {
         fun convertVideoToAudio(uri: String)
     }
