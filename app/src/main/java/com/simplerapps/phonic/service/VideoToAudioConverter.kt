@@ -29,6 +29,11 @@ class VideoToAudioConverter(
     }
 
     fun convert() {
+        if (!sourceFD.valid() || !desFD.valid()) {
+            listener.onFailed("Failed to convert! Please try again!")
+            return
+        }
+
         var trackNo = -1
         for (i in 0 until extractor.trackCount) {
             val format = extractor.getTrackFormat(i)
@@ -81,5 +86,6 @@ class VideoToAudioConverter(
          */
         fun onProgress(progress: Int)
         fun onFinish(uri: String)
+        fun onFailed(message: String)
     }
 }

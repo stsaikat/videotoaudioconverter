@@ -17,6 +17,8 @@ import com.simplerapps.phonic.databinding.ActivityShareBinding
 import com.simplerapps.phonic.getFileNameSerial
 import com.simplerapps.phonic.service.InfoActivity.Companion.CONTENT_URI
 import com.simplerapps.phonic.servicechooser.ServiceChooserActivity
+import com.simplerapps.phonic.shareAudioFile
+import com.simplerapps.phonic.showInfoDialog
 
 class ShareActivity : AppCompatActivity() {
 
@@ -78,6 +80,8 @@ class ShareActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        supportFragmentManager
         return when (item.itemId) {
             R.id.home -> {
                 goToHomeScreen()
@@ -95,12 +99,12 @@ class ShareActivity : AppCompatActivity() {
 
     private fun saveToExternalStorage(uri: String?) {
         if (uri == null) {
-            showInfoDialog("No files to save!")
+            showInfoDialog(supportFragmentManager,"No files to save!")
             return
         }
 
         if (alreadySaved) {
-            showInfoDialog("Already saved!")
+            showInfoDialog(supportFragmentManager,"Already saved!")
             return
         }
 
@@ -108,7 +112,7 @@ class ShareActivity : AppCompatActivity() {
         val externalUri = getExternalOutUri(externalName)
 
         if (externalUri == null) {
-            showInfoDialog("Failed to save!")
+            showInfoDialog(supportFragmentManager,"Failed to save!")
             return
         }
 
@@ -122,6 +126,7 @@ class ShareActivity : AppCompatActivity() {
         FileInfoManager.savedFileName = externalName
 
         showInfoDialog(
+            supportFragmentManager,
             title = "Saved Successfully!",
             message = "Saved To \"storage/Music/${FileInfoManager.savedFileName}\""
         )
@@ -145,6 +150,7 @@ class ShareActivity : AppCompatActivity() {
 
         if (FileInfoManager.savedFileUri == null) {
             showInfoDialog(
+                supportFragmentManager,
                 title = "Please save before share!",
                 message = "click on the \"SAVE TO STORAGE\" button to save."
             )
@@ -152,10 +158,7 @@ class ShareActivity : AppCompatActivity() {
             return
         }
 
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "audio/*"
-        intent.putExtra(Intent.EXTRA_STREAM, FileInfoManager.savedFileUri)
-        startActivity(Intent.createChooser(intent, "Share ${FileInfoManager.savedFileName} using"))
+        shareAudioFile(uri = FileInfoManager.savedFileUri!!, name = FileInfoManager.savedFileName)
     }
 
     private fun getToSaveName(): String {
@@ -167,8 +170,8 @@ class ShareActivity : AppCompatActivity() {
         return name
     }
 
-    private fun showInfoDialog(title: String? = null, message: String? = null) {
+/*    private fun showInfoDialog(title: String? = null, message: String? = null) {
         val processResultDialog = ProcessResultDialog(title, message)
         processResultDialog.show(supportFragmentManager, null)
-    }
+    }*/
 }

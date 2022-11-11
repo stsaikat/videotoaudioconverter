@@ -10,6 +10,7 @@ import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityInfoBinding
 import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.share.ShareActivity
+import com.simplerapps.phonic.showInfoDialog
 import java.io.File
 import kotlin.concurrent.thread
 
@@ -93,6 +94,10 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
                         intent.putExtra(CONTENT_URI, uri)
                         startActivity(intent)
                         finish()
+                    }
+
+                    override fun onFailed(message: String) {
+                        showInfoDialog(supportFragmentManager, title = "Error!", message = message)
                     }
                 }
             )
