@@ -1,9 +1,12 @@
 package com.simplerapps.phonic
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import com.simplerapps.phonic.share.ProcessResultDialog
 import java.text.SimpleDateFormat

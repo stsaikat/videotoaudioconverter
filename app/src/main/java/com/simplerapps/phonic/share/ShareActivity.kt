@@ -1,14 +1,19 @@
 package com.simplerapps.phonic.share
 
+import android.Manifest
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.simplerapps.phonic.R
@@ -23,11 +28,13 @@ import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.servicechooser.ServiceChooserActivity
 import com.simplerapps.phonic.shareAudioFile
 import com.simplerapps.phonic.showInfoDialog
+import java.io.File
 
 class ShareActivity : AppCompatActivity() {
 
     companion object {
         const val ALREADY_SAVED = "already_saved"
+        const val PERMISSION_REQUEST_CODE = 111
     }
 
     private lateinit var viewBinding: ActivityShareBinding
@@ -126,6 +133,13 @@ class ShareActivity : AppCompatActivity() {
             return
         }
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (needsPermission()){
+                requestPermission()
+                return
+            }
+        }
+
         val externalName = getToSaveName()
         val externalUri = getExternalOutUri(externalName)
 
@@ -166,6 +180,16 @@ class ShareActivity : AppCompatActivity() {
 
     private fun getExternalOutUri(name: String): Uri? {
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val externalDir = File(Environment.getExternalStorageDirectory(),"Music")
+            if (!externalDir.exists()) {
+                externalDir.createNewFile()
+            }
+
+            val toSaveFile = File(externalDir.absolutePath,name)
+            return Uri.fromFile(toSaveFile)
+        }
+
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, FileInfoManager.mimeType)
@@ -199,5 +223,36 @@ class ShareActivity : AppCompatActivity() {
         }
 
         return name
+    }
+
+    private fun needsPermission() : Boolean {
+        return ContextCompat.checkSelfPermission(this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ) == PackageManager.PERMISSION_DENIED
+    }
+
+    private fun requestPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+            PERMISSION_REQUEST_CODE
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                showInfoDialog(
+                    supportFragmentManager,
+                    "Ready to save!",
+                    "Congratulations! you granted save permission! you can now save your audio! click on the \"SAVE TO STORAGE\" button to save."
+                )
+            }
+        }
     }
 }
