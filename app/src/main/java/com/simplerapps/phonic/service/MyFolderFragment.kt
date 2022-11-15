@@ -3,7 +3,10 @@ package com.simplerapps.phonic.service
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.ProgressBar
+import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.ExoPlayer
@@ -15,6 +18,8 @@ import com.simplerapps.phonic.R
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
 import com.simplerapps.phonic.shareAudioFile
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
     MyFolderRecyclerViewAdapter.OnItemClickListener, Player.Listener {
@@ -23,6 +28,7 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
     private lateinit var myFolderRepo: MyFolderRepo
     private lateinit var playerView: PlayerView
     private lateinit var exoplayer: ExoPlayer
+    private lateinit var rvLoadingProgressBar: ProgressBar
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -30,10 +36,10 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         recyclerView = view.findViewById(R.id.rv_my_folder)
         playerView = view.findViewById(R.id.my_folder_player)
         myFolderRepo = MyFolderRepo(requireContext().applicationContext)
+        rvLoadingProgressBar = view.findViewById(R.id.pb_rv_loading)
 
         playerView.visibility = View.GONE
-
-        initRecyclerView()
+        rvLoadingProgressBar.visibility = View.VISIBLE
     }
 
     override fun onStart() {
@@ -45,6 +51,10 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         exoplayer.prepare()
         playerView.controllerShowTimeoutMs = 0
         playerView.controllerHideOnTouch = false
+
+        lifecycleScope.launch {
+            initRecyclerView()
+        }
     }
 
     override fun onStop() {
@@ -52,15 +62,17 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         exoplayer.release()
     }
 
-    private fun initRecyclerView() {
-        recyclerView.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+    private suspend fun initRecyclerView() {
         val list = ArrayList<AudioFileModel>()
         myFolderRepo.getMyAudioList()?.let {
             list.addAll(it)
         }
         val adapter = MyFolderRecyclerViewAdapter(list, this)
+        recyclerView.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         recyclerView.adapter = adapter
+
+        rvLoadingProgressBar.visibility = View.GONE
     }
 
     override fun onItemShareClick(audioFileModel: AudioFileModel) {
