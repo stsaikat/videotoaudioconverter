@@ -2,7 +2,9 @@ package com.simplerapps.phonic.service
 
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
@@ -15,6 +17,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerControlView
 import com.google.android.exoplayer2.ui.PlayerView
 import com.simplerapps.phonic.R
+import com.simplerapps.phonic.databinding.FragmentMyFolderBinding
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
 import com.simplerapps.phonic.shareAudioFile
@@ -24,33 +27,39 @@ import kotlinx.coroutines.launch
 class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
     MyFolderRecyclerViewAdapter.OnItemClickListener, Player.Listener {
 
-    private lateinit var recyclerView: RecyclerView
     private lateinit var myFolderRepo: MyFolderRepo
-    private lateinit var playerView: PlayerView
     private lateinit var exoplayer: ExoPlayer
-    private lateinit var rvLoadingProgressBar: ProgressBar
+
+    private lateinit var viewBinding: FragmentMyFolderBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        viewBinding = FragmentMyFolderBinding.inflate(inflater, container, false)
+        return viewBinding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recyclerView = view.findViewById(R.id.rv_my_folder)
-        playerView = view.findViewById(R.id.my_folder_player)
         myFolderRepo = MyFolderRepo(requireContext().applicationContext)
-        rvLoadingProgressBar = view.findViewById(R.id.pb_rv_loading)
 
-        playerView.visibility = View.GONE
-        rvLoadingProgressBar.visibility = View.VISIBLE
+        viewBinding.tvEmptyList.visibility = View.GONE
+        viewBinding.myFolderPlayer.visibility = View.GONE
+        viewBinding.pbRvLoading.visibility = View.VISIBLE
     }
 
     override fun onStart() {
         super.onStart()
 
         exoplayer = ExoPlayer.Builder(requireContext()).build()
-        playerView.player = exoplayer
+        viewBinding.myFolderPlayer.player = exoplayer
         exoplayer.playWhenReady = false
         exoplayer.prepare()
-        playerView.controllerShowTimeoutMs = 0
-        playerView.controllerHideOnTouch = false
+        viewBinding.myFolderPlayer.controllerShowTimeoutMs = 0
+        viewBinding.myFolderPlayer.controllerHideOnTouch = false
 
         lifecycleScope.launch {
             initRecyclerView()
@@ -62,17 +71,21 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         exoplayer.release()
     }
 
-    private suspend fun initRecyclerView() {
+    private fun initRecyclerView() {
         val list = ArrayList<AudioFileModel>()
         myFolderRepo.getMyAudioList()?.let {
             list.addAll(it)
         }
-        val adapter = MyFolderRecyclerViewAdapter(list, this)
-        recyclerView.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        recyclerView.adapter = adapter
 
-        rvLoadingProgressBar.visibility = View.GONE
+        if (list.isEmpty()) {
+            viewBinding.tvEmptyList.visibility = View.VISIBLE
+        }
+        val adapter = MyFolderRecyclerViewAdapter(list, this)
+        viewBinding.rvMyFolder.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        viewBinding.rvMyFolder.adapter = adapter
+
+        viewBinding.pbRvLoading.visibility = View.GONE
     }
 
     override fun onItemShareClick(audioFileModel: AudioFileModel) {
@@ -90,6 +103,6 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         exoplayer.prepare()
         exoplayer.play()
 
-        playerView.visibility = View.VISIBLE
+        viewBinding.myFolderPlayer.visibility = View.VISIBLE
     }
 }
