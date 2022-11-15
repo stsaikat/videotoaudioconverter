@@ -19,7 +19,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityShareBinding
-import com.simplerapps.phonic.getFileNameSerial
+import com.simplerapps.phonic.getFileCreateTime
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
 import com.simplerapps.phonic.service.InfoActivity
@@ -217,7 +217,7 @@ class ShareActivity : AppCompatActivity() {
     }
 
     private fun getToSaveName(): String {
-        var name = "Audio_Converter${getFileNameSerial()}.m4a"
+        var name = "${resources.getString(R.string.app_name)}_${getFileCreateTime()}.m4a"
         FileInfoManager.fileName?.let {
             name = "${it}_${name}"
         }
