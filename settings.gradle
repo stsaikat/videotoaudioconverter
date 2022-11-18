@@ -1,2 +1,3 @@
 rootProject.name = "Phonic"
 include ':app'
+include ':rangeseekbar'

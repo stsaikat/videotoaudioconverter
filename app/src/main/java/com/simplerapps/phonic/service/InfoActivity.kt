@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
+import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityInfoBinding
 import com.simplerapps.phonic.servicechooser.Service
@@ -69,7 +70,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
         }
     }
 
-    override fun convertVideoToAudio(uri: String) {
+    override fun convertVideoToAudio(uri: String,trim: Range?) {
         val convertProgressDialog = ConvertProgressDialog()
         convertProgressDialog.show(supportFragmentManager, null)
         convertProgressDialog.isCancelable = false
@@ -99,7 +100,8 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
                     override fun onFailed(message: String) {
                         showInfoDialog(supportFragmentManager, title = "Error!", message = message)
                     }
-                }
+                },
+                trim
             )
 
             videoToAudioConverter.convert()

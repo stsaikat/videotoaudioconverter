@@ -16,6 +16,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.innovattic.rangeseekbar.RangeSeekBar
+        android:id="@+id/rs_trim"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_trim"
+        app:rsb_touchRadius="48dp"
+        app:rsb_trackSelectedColor="@color/color_active"
+        app:rsb_trackSelectedThickness="18dp"
+        app:rsb_trackThickness="14dp" />
+
     <Button
         android:id="@+id/bt_convert"
         android:layout_width="wrap_content"
@@ -23,6 +36,16 @@
         android:layout_marginTop="32dp"
         android:backgroundTint="?attr/colorPrimary"
         android:text="Convert"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rs_trim" />
+
+    <TextView
+        android:id="@+id/tv_trim"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Trim [0,0]"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/exo_video_player" />

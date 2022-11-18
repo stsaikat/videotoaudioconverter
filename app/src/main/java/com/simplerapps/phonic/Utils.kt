@@ -53,3 +53,5 @@ fun showInfoDialog(
     val processResultDialog = ProcessResultDialog(title, message)
     processResultDialog.show(supportFragmentManager, null)
 }
+
+data class Range(var from: Int,var to: Int)
