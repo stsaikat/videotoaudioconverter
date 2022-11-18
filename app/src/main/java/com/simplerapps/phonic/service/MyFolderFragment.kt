@@ -47,7 +47,7 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         myFolderRepo = MyFolderRepo(requireContext().applicationContext)
 
         viewBinding.tvEmptyList.visibility = View.GONE
-        viewBinding.myFolderPlayer.visibility = View.GONE
+        //viewBinding.myFolderPlayer.visibility = View.GONE
         viewBinding.pbRvLoading.visibility = View.VISIBLE
     }
 
@@ -58,8 +58,6 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         viewBinding.myFolderPlayer.player = exoplayer
         exoplayer.playWhenReady = false
         exoplayer.prepare()
-        viewBinding.myFolderPlayer.controllerShowTimeoutMs = 0
-        viewBinding.myFolderPlayer.controllerHideOnTouch = false
 
         lifecycleScope.launch {
             initRecyclerView()
@@ -103,6 +101,6 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         exoplayer.prepare()
         exoplayer.play()
 
-        viewBinding.myFolderPlayer.visibility = View.VISIBLE
+        //viewBinding.myFolderPlayer.visibility = View.VISIBLE
     }
 }

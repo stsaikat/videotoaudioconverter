@@ -16,14 +16,14 @@
         tools:listitem="@layout/item_my_audio_element"
         android:requiresFadingEdge="vertical"/>
 
-    <com.google.android.exoplayer2.ui.PlayerView
+    <com.google.android.exoplayer2.ui.PlayerControlView
         android:id="@+id/my_folder_player"
         android:layout_width="0dp"
-        android:layout_height="100dp"
-        android:background="@android:color/black"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:show_timeout="0" />
 
     <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/pb_rv_loading"
