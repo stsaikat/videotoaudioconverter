@@ -6,6 +6,7 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.net.Uri
+import android.os.Build
 import com.simplerapps.phonic.common.FileInfoManager
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
@@ -47,7 +48,18 @@ class VideoToAudioConverter(
             }
         }
 
-        muxer = MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            muxer = MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        }
+        else {
+            val path = outputUri.path
+            if (path == null) {
+                listener.onFailed("Failed to convert! Please try again!")
+                return
+            }
+            muxer = MediaMuxer(path,MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        }
+
 
         val bufferInfo = MediaCodec.BufferInfo()
         bufferInfo.offset = 0

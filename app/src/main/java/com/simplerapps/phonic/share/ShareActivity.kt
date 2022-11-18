@@ -183,7 +183,7 @@ class ShareActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             val externalDir = File(Environment.getExternalStorageDirectory(),"Music")
             if (!externalDir.exists()) {
-                externalDir.createNewFile()
+                externalDir.mkdir()
             }
 
             val toSaveFile = File(externalDir.absolutePath,name)
