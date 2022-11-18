@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.dash.DashMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.simplerapps.phonic.LogD
@@ -21,11 +22,7 @@ class VideoToAudioInfoFragment(private val uri: String,private val listener: Lis
 
     private lateinit var exoplayer: ExoPlayer
     private var playbackPosition: Long = 0
-    private lateinit var playerView: PlayerView
-
-    private val dataSourceFactory: DataSource.Factory by lazy {
-        DefaultDataSourceFactory(requireContext(), "phonic")
-    }
+    private lateinit var playerView: StyledPlayerView
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -63,27 +60,8 @@ class VideoToAudioInfoFragment(private val uri: String,private val listener: Lis
         exoplayer.release()
     }
 
-    private fun preparePlayer(videoUrl: String, type: String) {
-        val uri = Uri.parse(videoUrl)
-        val mediaSource = buildMediaSource(uri, type)
-        exoplayer.setMediaSource(mediaSource)
-        exoplayer.prepare()
-    }
-
-    private fun buildMediaSource(uri: Uri, type: String): MediaSource {
-        val mediaItem = MediaItem.fromUri(uri)
-        return if (type == "dash") {
-            DashMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(mediaItem)
-        } else {
-            ProgressiveMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(mediaItem)
-        }
-    }
-
     override fun onPlayerError(error: PlaybackException) {
         super.onPlayerError(error)
-        LogD("${error.message}")
         Toast.makeText(requireContext(), "Can't play the video", Toast.LENGTH_SHORT).show()
     }
 

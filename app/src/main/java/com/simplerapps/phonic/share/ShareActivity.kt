@@ -61,8 +61,6 @@ class ShareActivity : AppCompatActivity() {
             viewBinding.audioPlayer.player = exoplayer
             exoplayer.playWhenReady = false
             exoplayer.prepare()
-            viewBinding.audioPlayer.controllerShowTimeoutMs = 0
-            viewBinding.audioPlayer.controllerHideOnTouch = false
         }
 
         viewBinding.btSaveToStorage.setOnClickListener {
