@@ -100,11 +100,15 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
 
             it.moveToFirst()
 
-            FileInfoManager.fileName = it.getString(nameIndex)
+            FileInfoManager.fileName = getMp4RemovedName(it.getString(nameIndex))
             FileInfoManager.fileSize = it.getLong(sizeIndex)
         }
 
         goToInfoActivity(Service.VIDEO_TO_AUDIO)
+    }
+
+    private fun getMp4RemovedName(name: String) : String {
+        return name.removeSuffix(".mp4")
     }
 
     private fun goToInfoActivity(withService: Service) {
