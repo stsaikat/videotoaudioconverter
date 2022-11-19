@@ -17,6 +17,8 @@ import com.innovattic.rangeseekbar.RangeSeekBar
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.databinding.FragmentVideoToAudioInfoBinding
+import java.lang.Integer.min
+import kotlin.math.max
 
 class VideoToAudioInfoFragment(private val uri: String, private val listener: Listener) :
     Fragment(R.layout.fragment_video_to_audio_info), Player.Listener,
@@ -50,6 +52,39 @@ class VideoToAudioInfoFragment(private val uri: String, private val listener: Li
         super.onStart()
         initSlider()
         initializePlayer(uri)
+        initButtonListeners()
+    }
+
+    private fun initButtonListeners() {
+        viewBinding.ibStartMinus.setOnClickListener {
+            viewBinding.rsTrim.setMinThumbValue(
+                max(0, viewBinding.rsTrim.getMinThumbValue() - 100)
+            )
+        }
+        viewBinding.ibStartAdd.setOnClickListener {
+            viewBinding.rsTrim.setMinThumbValue(
+                min(
+                    viewBinding.rsTrim.getMaxThumbValue(),
+                    viewBinding.rsTrim.getMinThumbValue() + 100
+                )
+            )
+        }
+        viewBinding.ibEndMinus.setOnClickListener {
+            viewBinding.rsTrim.setMaxThumbValue(
+                max(
+                    viewBinding.rsTrim.getMinThumbValue(),
+                    viewBinding.rsTrim.getMaxThumbValue() - 100
+                )
+            )
+        }
+        viewBinding.ibEndAdd.setOnClickListener {
+            viewBinding.rsTrim.setMaxThumbValue(
+                min(
+                    viewBinding.rsTrim.max,
+                    viewBinding.rsTrim.getMaxThumbValue() + 100
+                )
+            )
+        }
     }
 
     private fun initSlider() {
@@ -61,8 +96,7 @@ class VideoToAudioInfoFragment(private val uri: String, private val listener: Li
         }
 
         if (duration == null) {
-            viewBinding.rsTrim.visibility = View.GONE
-            viewBinding.tvTrim.visibility = View.GONE
+            viewBinding.clTrimCompo.visibility = View.GONE
         }
     }
 
@@ -131,22 +165,29 @@ class VideoToAudioInfoFragment(private val uri: String, private val listener: Li
 
     private fun processTrimTime(startMs: Int, endMs: Int) {
         audioTrimRange = Range(startMs, endMs)
-        setAudioTrimText(startMs, endMs)
+        setStartText(startMs)
+        setEndText(endMs)
+        setDurationText(endMs - startMs)
     }
 
-    private fun setAudioTrimText(startMs: Int, endMs: Int) {
-        val message =
-            "Trim : [${getFormattedTimeText(startMs)}s, ${getFormattedTimeText(endMs)}s]\n\nDuration : ${
-                getFormattedTimeText(endMs - startMs)
-            }s"
-        viewBinding.tvTrim.text = message
+    private fun setStartText(startMs: Int) {
+        viewBinding.tvStart.text = getFormattedTimeText(startMs)
+    }
+
+    private fun setEndText(endMs: Int) {
+        viewBinding.tvEnd.text = getFormattedTimeText(endMs)
+    }
+
+    private fun setDurationText(duration: Int) {
+        viewBinding.tvDuration.text = "duration : ${getFormattedTimeText(duration)}"
     }
 
     private fun getFormattedTimeText(time: Int): String {
+        val ss = (time % 1000) / 100
         val seconds = time / 1000
         val s = seconds % 60
         val m = (seconds / 60) % 60
         val h = (seconds / (60 * 60)) % 24
-        return String.format("%02d:%02d:%02d", h, m, s)
+        return String.format("%02d:%02d:%02d.%01d", h, m, s, ss)
     }
 }

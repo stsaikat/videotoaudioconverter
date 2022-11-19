@@ -81,7 +81,6 @@ class VideoToAudioConverter(
         }
 
         while (true) {
-            Thread.sleep(10)
             bufferInfo.size = extractor.readSampleData(buffer, bufferInfo.offset)
             if (bufferInfo.size < 0) {
                 bufferInfo.size = 0

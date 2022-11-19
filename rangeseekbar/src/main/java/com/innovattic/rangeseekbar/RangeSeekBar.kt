@@ -309,6 +309,11 @@ open class RangeSeekBar @JvmOverloads constructor(
 		minThumbValue = max(value, 0)
 		keepMinWindow(THUMB_MIN)
 		invalidate()
+
+		if (lastMinThumbValue != minThumbValue) {
+			lastMinThumbValue = minThumbValue
+			seekBarChangeListener?.onValueChanged(minThumbValue, maxThumbValue)
+		}
 	}
 
 	/**
@@ -323,6 +328,10 @@ open class RangeSeekBar @JvmOverloads constructor(
 		maxThumbValue = min(value, max)
 		keepMinWindow(THUMB_MAX)
 		invalidate()
+		if (lastMaxThumbValue != maxThumbValue) {
+			lastMaxThumbValue = maxThumbValue
+			seekBarChangeListener?.onValueChanged(minThumbValue, maxThumbValue)
+		}
 	}
 
 	/**
