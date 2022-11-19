@@ -6,28 +6,32 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.Menu
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.simplerapps.phonic.R
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.OnUserEarnedRewardListener
+import com.google.android.gms.ads.rewarded.RewardedAd
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
+import com.simplerapps.phonic.*
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityShareBinding
-import com.simplerapps.phonic.getFileCreateTime
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
 import com.simplerapps.phonic.service.InfoActivity
 import com.simplerapps.phonic.service.InfoActivity.Companion.CONTENT_URI
 import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.servicechooser.ServiceChooserActivity
-import com.simplerapps.phonic.shareAudioFile
-import com.simplerapps.phonic.showInfoDialog
 import java.io.File
 
 class ShareActivity : AppCompatActivity() {
@@ -47,6 +51,9 @@ class ShareActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityShareBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
+        //showRewardedAd()
+        showRewardedInterstitialAd()
 
         savedInstanceState?.let {
             alreadySaved = it.getBoolean(ALREADY_SAVED)
@@ -122,17 +129,17 @@ class ShareActivity : AppCompatActivity() {
 
     private fun saveToExternalStorage(uri: String?) {
         if (uri == null) {
-            showInfoDialog(supportFragmentManager,"No files to save!")
+            showInfoDialog(supportFragmentManager, "No files to save!")
             return
         }
 
         if (alreadySaved) {
-            showInfoDialog(supportFragmentManager,"Already saved!")
+            showInfoDialog(supportFragmentManager, "Already saved!")
             return
         }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            if (needsPermission()){
+            if (needsPermission()) {
                 requestPermission()
                 return
             }
@@ -142,7 +149,7 @@ class ShareActivity : AppCompatActivity() {
         val externalUri = getExternalOutUri(externalName)
 
         if (externalUri == null) {
-            showInfoDialog(supportFragmentManager,"Failed to save!")
+            showInfoDialog(supportFragmentManager, "Failed to save!")
             return
         }
 
@@ -179,12 +186,12 @@ class ShareActivity : AppCompatActivity() {
     private fun getExternalOutUri(name: String): Uri? {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            val externalDir = File(Environment.getExternalStorageDirectory(),"Music")
+            val externalDir = File(Environment.getExternalStorageDirectory(), "Music")
             if (!externalDir.exists()) {
                 externalDir.mkdir()
             }
 
-            val toSaveFile = File(externalDir.absolutePath,name)
+            val toSaveFile = File(externalDir.absolutePath, name)
             return Uri.fromFile(toSaveFile)
         }
 
@@ -223,8 +230,9 @@ class ShareActivity : AppCompatActivity() {
         return name
     }
 
-    private fun needsPermission() : Boolean {
-        return ContextCompat.checkSelfPermission(this,
+    private fun needsPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_DENIED
     }
@@ -252,5 +260,56 @@ class ShareActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+
+    private fun showRewardedAd() {
+        val adRequest = AdRequest.Builder().build()
+        RewardedAd.load(
+            this, resources.getString(R.string.rewarded_ad_id),
+            adRequest,
+            object : RewardedAdLoadCallback() {
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    super.onAdFailedToLoad(error)
+
+                    LogD(error.message)
+                }
+
+                override fun onAdLoaded(ad: RewardedAd) {
+                    super.onAdLoaded(ad)
+
+                    ad.show(
+                        this@ShareActivity,
+                        OnUserEarnedRewardListener {
+
+                        }
+                    )
+                }
+            }
+        )
+    }
+
+    private fun showRewardedInterstitialAd() {
+        RewardedInterstitialAd.load(
+            this,
+            resources.getString(R.string.rewarded_interstitial_ad_id),
+            AdRequest.Builder().build(),
+            object : RewardedInterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(error: LoadAdError) {
+                    super.onAdFailedToLoad(error)
+                    LogD(error.message)
+                }
+
+                override fun onAdLoaded(ad: RewardedInterstitialAd) {
+                    super.onAdLoaded(ad)
+
+                    ad.show(
+                        this@ShareActivity,
+                        OnUserEarnedRewardListener {
+
+                        }
+                    )
+                }
+            }
+        )
     }
 }

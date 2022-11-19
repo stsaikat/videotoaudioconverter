@@ -2,11 +2,12 @@ package com.simplerapps.phonic.servicechooser
 
 import android.content.Intent
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.OpenableColumns
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.gms.ads.AdRequest
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityServiceChooserBinding
 import com.simplerapps.phonic.service.InfoActivity
@@ -23,6 +24,10 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
         super.onCreate(savedInstanceState)
         viewBinding = ActivityServiceChooserBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
+
+        viewBinding.adBannerServiceChooser.loadAd(
+            AdRequest.Builder().build()
+        )
 
         initAllViews()
         initAllListeners()

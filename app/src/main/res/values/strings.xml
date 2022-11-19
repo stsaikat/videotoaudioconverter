@@ -2,4 +2,10 @@
     <string name="app_name">Phonic</string>
     <string name="home">home</string>
     <string name="my_folder">My Folder</string>
+
+    <!-- ad test ids -->
+    <string name="banner_ad_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="rewarded_ad_id">ca-app-pub-3940256099942544/5224354917</string>
+    <string name="rewarded_interstitial_ad_id">ca-app-pub-3940256099942544/5354046379</string>
+
 </resources>

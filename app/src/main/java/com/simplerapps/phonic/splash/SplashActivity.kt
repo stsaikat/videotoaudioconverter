@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import com.google.android.gms.ads.MobileAds
 import com.simplerapps.phonic.databinding.ActivitySplashBinding
 import com.simplerapps.phonic.servicechooser.ServiceChooserActivity
 
@@ -17,6 +18,8 @@ class SplashActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
 
         supportActionBar?.hide()
+
+        MobileAds.initialize(applicationContext)
 
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this,ServiceChooserActivity::class.java)
