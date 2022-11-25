@@ -2,6 +2,7 @@ package com.innovattic.rangeseekbar
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Resources
 import android.content.res.TypedArray
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -10,6 +11,7 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -480,18 +482,23 @@ open class RangeSeekBar @JvmOverloads constructor(
 	}
 
 	private fun extractMinThumbOffset(a: TypedArray): Point {
-		val x = a.getDimensionPixelSize(R.styleable.RangeSeekBar_rsb_minThumbOffsetHorizontal, 0)
+		val x = a.getDimensionPixelSize(R.styleable.RangeSeekBar_rsb_minThumbOffsetHorizontal, (-6).toPx)
 		val y = a.getDimensionPixelSize(R.styleable.RangeSeekBar_rsb_minThumbOffsetVertical, 0)
 		return Point(x, y)
 	}
 
 	private fun extractMaxThumbOffset(a: TypedArray): Point {
-		val x = a.getDimensionPixelSize(R.styleable.RangeSeekBar_rsb_maxThumbOffsetHorizontal, 0)
+		val x = a.getDimensionPixelSize(R.styleable.RangeSeekBar_rsb_maxThumbOffsetHorizontal, 6.toPx)
 		val y = a.getDimensionPixelSize(R.styleable.RangeSeekBar_rsb_maxThumbOffsetVertical, 0)
 		return Point(x, y)
 	}
 	// endregion
 	// endregion
+
+	private val Number.toPx get() = TypedValue.applyDimension(
+		TypedValue.COMPLEX_UNIT_DIP,
+		this.toFloat(),
+		Resources.getSystem().displayMetrics).toInt()
 
 	companion object {
 		private const val THUMB_NONE = 0
