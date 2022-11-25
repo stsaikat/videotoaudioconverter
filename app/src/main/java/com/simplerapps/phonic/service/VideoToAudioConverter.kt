@@ -7,6 +7,8 @@ import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.net.Uri
 import android.os.Build
+import android.os.ParcelFileDescriptor
+import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.common.FileInfoManager
 import java.io.FileDescriptor
@@ -21,26 +23,38 @@ class VideoToAudioConverter(
 ) {
 
     private var extractor: MediaExtractor = MediaExtractor()
-    private var sourceFD: FileDescriptor =
-        context.contentResolver.openFileDescriptor(uri, "r")!!.fileDescriptor
-    private var desFD: FileDescriptor =
-        context.contentResolver.openFileDescriptor(outputUri, "w")!!.fileDescriptor
+    private var sourcePFD: ParcelFileDescriptor? = null
+    private lateinit var sourceFD: FileDescriptor
+    private var desPFD: ParcelFileDescriptor? = null
+    private lateinit var desFD: FileDescriptor
     private lateinit var muxer: MediaMuxer
     private val buffer = ByteBuffer.allocate(1024 * 1024)
     private var durationUs = 0L
 
     init {
-        extractor.setDataSource(sourceFD)
         trim?.let {
             durationUs = (trim.to - trim.from) * 1000L
         }
     }
 
     fun convert() {
-        if (!sourceFD.valid() || !desFD.valid()) {
-            listener.onFailed("Failed to convert! Please try again!")
+        sourcePFD = context.contentResolver.openFileDescriptor(uri, "r")
+        desPFD = context.contentResolver.openFileDescriptor(outputUri, "w")
+
+        if (sourcePFD == null || desPFD == null) {
+            onConversionFailed()
             return
         }
+
+        sourceFD = sourcePFD!!.fileDescriptor
+        desFD = desPFD!!.fileDescriptor
+
+        if (!sourceFD.valid() || !desFD.valid()) {
+            onConversionFailed()
+            return
+        }
+
+        extractor.setDataSource(sourceFD)
 
         var trackNo = -1
         for (i in 0 until extractor.trackCount) {
@@ -57,21 +71,35 @@ class VideoToAudioConverter(
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            muxer = MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+        if (trackNo == -1) {
+            onConversionFailed("No Audio Found in this video!")
+            return
+        }
+
+        muxer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         } else {
             val path = outputUri.path
             if (path == null) {
-                listener.onFailed("Failed to convert! Please try again!")
+                onConversionFailed()
                 return
             }
-            muxer = MediaMuxer(path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            MediaMuxer(path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         }
 
 
         val bufferInfo = MediaCodec.BufferInfo()
         bufferInfo.offset = 0
-        val muxerIndex = muxer.addTrack(extractor.getTrackFormat(trackNo))
+
+        val muxerIndex = try {
+            muxer.addTrack(extractor.getTrackFormat(trackNo))
+        }
+        catch (e: IllegalStateException) {
+            e.printStackTrace()
+            onConversionFailed("This format isn't supported!")
+            return
+        }
+
         muxer.start()
 
         trim?.let {
@@ -95,8 +123,7 @@ class VideoToAudioConverter(
 
             bufferInfo.presentationTimeUs = if (trim == null) {
                 extractor.sampleTime
-            }
-            else {
+            } else {
                 extractor.sampleTime - trim.from * 1000
             }
             listener.onProgress(
@@ -108,15 +135,34 @@ class VideoToAudioConverter(
         }
 
         release()
+        listener.onFinish(outputUri.toString())
+    }
+
+    private fun onConversionFailed(message: String = "Failed to convert! Please try again!") {
+        release()
+        listener.onFailed(message)
     }
 
     private fun release() {
-        buffer.clear()
-        muxer.stop()
-        muxer.release()
-        extractor.release()
+        sourcePFD?.close()
+        desPFD?.close()
 
-        listener.onFinish(outputUri.toString())
+        buffer.clear()
+
+        try {
+            muxer.stop()
+            muxer.release()
+        }
+        catch (e: UninitializedPropertyAccessException) {
+            e.printStackTrace()
+            // muxer isn't started so no need to stop or release
+        }
+        catch (e: IllegalStateException) {
+            e.printStackTrace()
+            // muxer isn't started so no need to stop or release
+        }
+
+        extractor.release()
     }
 
     interface Listener {

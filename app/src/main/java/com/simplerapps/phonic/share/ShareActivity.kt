@@ -52,8 +52,8 @@ class ShareActivity : AppCompatActivity() {
         viewBinding = ActivityShareBinding.inflate(layoutInflater)
         setContentView(viewBinding.root)
 
-        //showRewardedAd()
-        showRewardedInterstitialAd()
+        showRewardedAd()
+        //showRewardedInterstitialAd()
 
         savedInstanceState?.let {
             alreadySaved = it.getBoolean(ALREADY_SAVED)
@@ -265,7 +265,7 @@ class ShareActivity : AppCompatActivity() {
     private fun showRewardedAd() {
         val adRequest = AdRequest.Builder().build()
         RewardedAd.load(
-            this, resources.getString(R.string.rewarded_ad_id),
+            this, resources.getString(R.string.share_start_rewarded_ad_id),
             adRequest,
             object : RewardedAdLoadCallback() {
                 override fun onAdFailedToLoad(error: LoadAdError) {
@@ -280,32 +280,7 @@ class ShareActivity : AppCompatActivity() {
                     ad.show(
                         this@ShareActivity,
                         OnUserEarnedRewardListener {
-
-                        }
-                    )
-                }
-            }
-        )
-    }
-
-    private fun showRewardedInterstitialAd() {
-        RewardedInterstitialAd.load(
-            this,
-            resources.getString(R.string.rewarded_interstitial_ad_id),
-            AdRequest.Builder().build(),
-            object : RewardedInterstitialAdLoadCallback() {
-                override fun onAdFailedToLoad(error: LoadAdError) {
-                    super.onAdFailedToLoad(error)
-                    LogD(error.message)
-                }
-
-                override fun onAdLoaded(ad: RewardedInterstitialAd) {
-                    super.onAdLoaded(ad)
-
-                    ad.show(
-                        this@ShareActivity,
-                        OnUserEarnedRewardListener {
-
+                            LogD(it.amount.toString())
                         }
                     )
                 }

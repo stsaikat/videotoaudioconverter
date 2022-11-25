@@ -81,7 +81,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
             val outUri = Uri.fromFile(outFile)
 
             val videoToAudioConverter = VideoToAudioConverter(
-                this.applicationContext,
+                this,
                 Uri.parse(uri),
                 outUri,
                 object : VideoToAudioConverter.Listener {
@@ -90,7 +90,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
                     }
 
                     override fun onFinish(uri: String) {
-                        convertProgressDialog.dismiss()
+
                         val intent = Intent(this@InfoActivity, ShareActivity::class.java)
                         intent.putExtra(CONTENT_URI, uri)
                         startActivity(intent)
@@ -98,6 +98,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener {
                     }
 
                     override fun onFailed(message: String) {
+                        convertProgressDialog.dismiss()
                         showInfoDialog(supportFragmentManager, title = "Error!", message = message)
                     }
                 },
