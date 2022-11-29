@@ -12,8 +12,8 @@ android {
         applicationId "com.simplerapps.phonic"
         minSdk 23
         targetSdk 33
-        versionCode 3
-        versionName "0.0.3"
+        versionCode 4
+        versionName "0.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -21,6 +21,10 @@ android {
     buildTypes {
         debug {
             debuggable true
+
+            resValue "string", "admob_app_id", '"ca-app-pub-3940256099942544~3347511713"'
+            resValue "string", "service_chooser_banner_ad_id", '"ca-app-pub-3940256099942544/6300978111"'
+            resValue "string", "share_start_rewarded_ad_id", '"ca-app-pub-3940256099942544/5354046379"'
         }
         release {
             debuggable false
@@ -28,6 +32,10 @@ android {
             shrinkResources true
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            resValue "string", "admob_app_id", '"ca-app-pub-7698042433155353~5364004790"'
+            resValue "string", "service_chooser_banner_ad_id", '"ca-app-pub-7698042433155353/9809396705"'
+            resValue "string", "share_start_rewarded_ad_id", '"ca-app-pub-7698042433155353/9973048237"'
         }
     }
     compileOptions {

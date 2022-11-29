@@ -24,6 +24,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.simplerapps.phonic.*
+import com.simplerapps.phonic.common.AdManager
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityShareBinding
 import com.simplerapps.phonic.repository.AudioFileModel
@@ -263,28 +264,13 @@ class ShareActivity : AppCompatActivity() {
     }
 
     private fun showRewardedAd() {
-        val adRequest = AdRequest.Builder().build()
-        RewardedAd.load(
-            this, resources.getString(R.string.share_start_rewarded_ad_id),
-            adRequest,
-            object : RewardedAdLoadCallback() {
-                override fun onAdFailedToLoad(error: LoadAdError) {
-                    super.onAdFailedToLoad(error)
-
-                    LogD(error.message)
+        AdManager.rewardedAd?.let {
+            it.show(
+                this@ShareActivity,
+                OnUserEarnedRewardListener { rewardItem ->
+                    LogD("${rewardItem.amount}")
                 }
-
-                override fun onAdLoaded(ad: RewardedAd) {
-                    super.onAdLoaded(ad)
-
-                    ad.show(
-                        this@ShareActivity,
-                        OnUserEarnedRewardListener {
-                            LogD(it.amount.toString())
-                        }
-                    )
-                }
-            }
-        )
+            )
+        }
     }
 }

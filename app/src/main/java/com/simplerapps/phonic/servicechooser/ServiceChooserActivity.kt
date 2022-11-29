@@ -16,6 +16,7 @@ import com.simplerapps.phonic.service.InfoActivity.Companion.SERVICE_ID
 class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickListener {
     companion object {
         const val VIDEO_REQUEST_CODE = 0
+        const val AUDIO_REQUEST_CODE = 1
     }
 
     private lateinit var viewBinding: ActivityServiceChooserBinding
@@ -54,8 +55,7 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
 
     private fun getServicesList() = arrayListOf(
         Service.VIDEO_TO_AUDIO,
-/*        Service.EDIT_AUDIO,
-        Service.MERGE_AUDIO,*/
+        Service.EDIT_AUDIO,
         Service.MY_FOLDER
     )
 
@@ -65,7 +65,7 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
                 pickVideo()
             }
             Service.EDIT_AUDIO -> {
-
+                pickAudio()
             }
             Service.MERGE_AUDIO -> {
 
@@ -81,6 +81,13 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
         startActivityForResult(intent, VIDEO_REQUEST_CODE)
     }
 
+    private fun pickAudio() {
+        val intent = Intent()
+        intent.type = "audio/*"
+        intent.action = Intent.ACTION_OPEN_DOCUMENT
+        startActivityForResult(Intent.createChooser(intent,"Select Audio"), AUDIO_REQUEST_CODE)
+    }
+
     @Deprecated("")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -90,6 +97,13 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
                     data?.let { intent ->
                         intent.data?.let {
                             processChosenVideoUri(it)
+                        }
+                    }
+                }
+                AUDIO_REQUEST_CODE -> {
+                    data?.let { intent ->
+                        intent.data?.let {
+                            processChosenAudioUri(it)
                         }
                     }
                 }
@@ -112,8 +126,23 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
         goToInfoActivity(Service.VIDEO_TO_AUDIO)
     }
 
+    private fun processChosenAudioUri(uri: Uri) {
+        FileInfoManager.fileUri = uri
+        contentResolver.query(uri, null, null, null, null)?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+
+            it.moveToFirst()
+
+            FileInfoManager.fileName = getMp4RemovedName(it.getString(nameIndex))
+            FileInfoManager.fileSize = it.getLong(sizeIndex)
+        }
+
+        goToInfoActivity(Service.EDIT_AUDIO)
+    }
+
     private fun getMp4RemovedName(name: String) : String {
-        return name.removeSuffix(".mp4")
+        return name.removeSuffix(".mp4").removeSuffix(".m4a").removeSuffix(".mp3")
     }
 
     private fun goToInfoActivity(withService: Service) {

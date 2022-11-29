@@ -1,15 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Phonic</string>
     <string name="home">home</string>
     <string name="my_folder">My Folder</string>
-
-    <!-- ad test ids -->
-    <string name="service_chooser_banner_ad_id">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="share_start_rewarded_ad_id">ca-app-pub-3940256099942544/5354046379</string>
-
-
-<!--    &lt;!&ndash; real ad ids &ndash;&gt;
-    <string name="service_chooser_banner_ad_id">ca-app-pub-7698042433155353/9809396705</string>
-    <string name="share_start_rewarded_ad_id">ca-app-pub-7698042433155353/9973048237</string>-->
-
 </resources>
