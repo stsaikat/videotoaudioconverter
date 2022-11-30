@@ -8,17 +8,18 @@ import android.media.MediaMuxer
 import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.common.FileInfoManager
+import com.simplerapps.phonic.common.ProgressListener
+import com.simplerapps.phonic.tools.AudioTranscoder
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 
-class VideoToAudioConverter(
+class AudioConverter(
     private val context: Context,
     private val uri: Uri,
     private val outputUri: Uri,
-    private val listener: Listener,
+    private val listener: ProgressListener,
     private val trim: Range?
 ) {
 
@@ -61,6 +62,13 @@ class VideoToAudioConverter(
             val format = extractor.getTrackFormat(i)
             val mimeType = format.getString(MediaFormat.KEY_MIME)!!
             if (mimeType.startsWith("audio/")) {
+
+                if (!mimeType.contains("mp4a")) {
+                    release()
+                    startTranscoderFlow()
+                    return
+                }
+
                 FileInfoManager.mimeType = mimeType
                 extractor.selectTrack(i)
                 trackNo = i
@@ -165,12 +173,14 @@ class VideoToAudioConverter(
         extractor.release()
     }
 
-    interface Listener {
-        /**
-         * get progress from 0 to 100
-         */
-        fun onProgress(progress: Int)
-        fun onFinish(uri: String)
-        fun onFailed(message: String)
+    private fun startTranscoderFlow() {
+        val audioTranscoder = AudioTranscoder(
+            context,
+            uri,
+            outputUri,
+            listener,
+            trim
+        )
+        audioTranscoder.process()
     }
 }

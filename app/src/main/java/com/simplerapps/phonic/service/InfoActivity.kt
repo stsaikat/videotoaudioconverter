@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.common.FileInfoManager
+import com.simplerapps.phonic.common.ProgressListener
 import com.simplerapps.phonic.databinding.ActivityInfoBinding
 import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.share.ShareActivity
@@ -16,13 +17,14 @@ import java.io.File
 import kotlin.concurrent.thread
 
 class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener,
-    EditAudioFragment.Listener {
+    EditAudioFragment.Listener, ProgressListener {
     companion object {
         const val SERVICE_ID = "service_id"
         const val CONTENT_URI = "content_uri"
     }
 
     private lateinit var viewBinding: ActivityInfoBinding
+    private val convertProgressDialog = ConvertProgressDialog()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +54,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener,
 
             }
         }
+        convertProgressDialog.isCancelable = false
     }
 
     private fun showVideoToAudioFragment(uri: String?) {
@@ -81,81 +84,60 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener,
     }
 
     override fun convertVideoToAudio(uri: String, trim: Range?) {
-        val convertProgressDialog = ConvertProgressDialog()
         convertProgressDialog.show(supportFragmentManager, null)
-        convertProgressDialog.isCancelable = false
 
         thread(start = true) {
             val outFile =
                 File(applicationContext.cacheDir.absolutePath + FileInfoManager.cacheName)
             val outUri = Uri.fromFile(outFile)
 
-            val videoToAudioConverter = VideoToAudioConverter(
+            val audioConverter = AudioConverter(
                 this,
                 Uri.parse(uri),
                 outUri,
-                object : VideoToAudioConverter.Listener {
-                    override fun onProgress(progress: Int) {
-                        convertProgressDialog.setProgress(progress)
-                    }
-
-                    override fun onFinish(uri: String) {
-
-                        val intent = Intent(this@InfoActivity, ShareActivity::class.java)
-                        intent.putExtra(CONTENT_URI, uri)
-                        startActivity(intent)
-                        finish()
-                    }
-
-                    override fun onFailed(message: String) {
-                        convertProgressDialog.dismiss()
-                        showInfoDialog(supportFragmentManager, title = "Error!", message = message)
-                    }
-                },
+                this,
                 trim
             )
 
-            videoToAudioConverter.convert()
+            audioConverter.convert()
         }
 
     }
 
     override fun editAudio(uri: String, trim: Range?) {
-        val convertProgressDialog = ConvertProgressDialog()
         convertProgressDialog.show(supportFragmentManager, null)
-        convertProgressDialog.isCancelable = false
 
         thread(start = true) {
             val outFile =
                 File(applicationContext.cacheDir.absolutePath + FileInfoManager.cacheName)
             val outUri = Uri.fromFile(outFile)
 
-            val videoToAudioConverter = VideoToAudioConverter(
+            val audioTranscoder = AudioConverter(
                 this,
                 Uri.parse(uri),
                 outUri,
-                object : VideoToAudioConverter.Listener {
-                    override fun onProgress(progress: Int) {
-                        convertProgressDialog.setProgress(progress)
-                    }
-
-                    override fun onFinish(uri: String) {
-
-                        val intent = Intent(this@InfoActivity, ShareActivity::class.java)
-                        intent.putExtra(CONTENT_URI, uri)
-                        startActivity(intent)
-                        finish()
-                    }
-
-                    override fun onFailed(message: String) {
-                        convertProgressDialog.dismiss()
-                        showInfoDialog(supportFragmentManager, title = "Error!", message = message)
-                    }
-                },
+                this,
                 trim
             )
 
-            videoToAudioConverter.convert()
+            audioTranscoder.convert()
         }
+    }
+
+    override fun onProgress(progress: Int) {
+        convertProgressDialog.setProgress(progress)
+    }
+
+    override fun onFinish(uri: String) {
+        convertProgressDialog.dismiss()
+        val intent = Intent(this@InfoActivity, ShareActivity::class.java)
+        intent.putExtra(CONTENT_URI, uri)
+        startActivity(intent)
+        finish()
+    }
+
+    override fun onFailed(message: String) {
+        convertProgressDialog.dismiss()
+        showInfoDialog(supportFragmentManager, title = "Error!", message = message)
     }
 }
