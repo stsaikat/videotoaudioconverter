@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/bt_trim"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="48dp"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_baseline_content_cut_24"
+        android:drawablePadding="8dp"
+        android:text="Cut"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_volume"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="72dp"
+        android:layout_marginTop="48dp"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_baseline_volume_up_24"
+        android:drawablePadding="8dp"
+        android:text="Volume"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toEndOf="@+id/bt_trim"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_trim_choosen_volume"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="100%"
+        android:textSize="12sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/bt_volume"
+        app:layout_constraintEnd_toEndOf="@+id/bt_volume"
+        app:layout_constraintStart_toStartOf="@+id/bt_volume" />
+
+    <TextView
+        android:id="@+id/tv_trim_choosen_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="00:00:00.0"
+        android:textSize="12sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/bt_trim"
+        app:layout_constraintEnd_toEndOf="@+id/bt_trim"
+        app:layout_constraintStart_toStartOf="@+id/bt_trim" />
+</androidx.constraintlayout.widget.ConstraintLayout>

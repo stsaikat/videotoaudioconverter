@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
@@ -16,17 +17,17 @@ import com.google.android.exoplayer2.Player
 import com.innovattic.rangeseekbar.RangeSeekBar
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.Range
+import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.FragmentVideoToAudioInfoBinding
+import com.simplerapps.phonic.fragment.AudioInfoFragment
 import java.lang.Integer.min
 import kotlin.math.max
 
 class VideoToAudioInfoFragment(private val uri: String, private val listener: Listener) :
-    Fragment(R.layout.fragment_video_to_audio_info), Player.Listener,
-    RangeSeekBar.SeekBarChangeListener {
+    Fragment(R.layout.fragment_video_to_audio_info), Player.Listener {
 
     private lateinit var exoplayer: ExoPlayer
     private lateinit var viewBinding: FragmentVideoToAudioInfoBinding
-    private var audioTrimRange: Range? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,61 +43,25 @@ class VideoToAudioInfoFragment(private val uri: String, private val listener: Li
 
         viewBinding.btConvert.setOnClickListener {
             exoplayer.pause()
-            listener.convertVideoToAudio(uri, audioTrimRange)
+            listener.convertVideoToAudio(uri, FileInfoManager.trim)
         }
-
-
     }
 
     override fun onStart() {
         super.onStart()
-        initSlider()
+        showAudioInfoFragment()
         initializePlayer(uri)
-        initButtonListeners()
     }
 
-    private fun initButtonListeners() {
-        viewBinding.ibStartMinus.setOnClickListener {
-            viewBinding.rsTrim.setMinThumbValue(
-                max(0, viewBinding.rsTrim.getMinThumbValue() - 100)
-            )
-        }
-        viewBinding.ibStartAdd.setOnClickListener {
-            viewBinding.rsTrim.setMinThumbValue(
-                min(
-                    viewBinding.rsTrim.getMaxThumbValue(),
-                    viewBinding.rsTrim.getMinThumbValue() + 100
-                )
-            )
-        }
-        viewBinding.ibEndMinus.setOnClickListener {
-            viewBinding.rsTrim.setMaxThumbValue(
-                max(
-                    viewBinding.rsTrim.getMinThumbValue(),
-                    viewBinding.rsTrim.getMaxThumbValue() - 100
-                )
-            )
-        }
-        viewBinding.ibEndAdd.setOnClickListener {
-            viewBinding.rsTrim.setMaxThumbValue(
-                min(
-                    viewBinding.rsTrim.max,
-                    viewBinding.rsTrim.getMaxThumbValue() + 100
-                )
-            )
-        }
+    private fun showAudioInfoFragment() {
+        val audioInfoFragment = AudioInfoFragment(Uri.parse(uri))
+        showFragment(audioInfoFragment)
     }
 
-    private fun initSlider() {
-        val duration = getAudioDuration()
-        duration?.let {
-            viewBinding.rsTrim.seekBarChangeListener = this
-            viewBinding.rsTrim.max = (duration / 1000).toInt()
-            processTrimTime(0, (duration / 1000).toInt())
-        }
-
-        if (duration == null) {
-            viewBinding.clTrimCompo.visibility = View.GONE
+    private fun showFragment(fragment: Fragment) {
+        childFragmentManager.commit {
+            setReorderingAllowed(true)
+            replace(viewBinding.fragmentContainerAudioInfo.id, fragment)
         }
     }
 
@@ -145,49 +110,5 @@ class VideoToAudioInfoFragment(private val uri: String, private val listener: Li
 
     interface Listener {
         fun convertVideoToAudio(uri: String, trim: Range?)
-    }
-
-    override fun onStartedSeeking() {
-
-    }
-
-    override fun onStoppedSeeking() {
-
-    }
-
-    /**
-     * minThumbValue = start time ms
-     * maxThumbValue = end time ms
-     */
-    override fun onValueChanged(minThumbValue: Int, maxThumbValue: Int) {
-        processTrimTime(minThumbValue, maxThumbValue)
-    }
-
-    private fun processTrimTime(startMs: Int, endMs: Int) {
-        audioTrimRange = Range(startMs, endMs)
-        setStartText(startMs)
-        setEndText(endMs)
-        setDurationText(endMs - startMs)
-    }
-
-    private fun setStartText(startMs: Int) {
-        viewBinding.tvStart.text = getFormattedTimeText(startMs)
-    }
-
-    private fun setEndText(endMs: Int) {
-        viewBinding.tvEnd.text = getFormattedTimeText(endMs)
-    }
-
-    private fun setDurationText(duration: Int) {
-        viewBinding.tvDuration.text = "duration : ${getFormattedTimeText(duration)}"
-    }
-
-    private fun getFormattedTimeText(time: Int): String {
-        val ss = (time % 1000) / 100
-        val seconds = time / 1000
-        val s = seconds % 60
-        val m = (seconds / 60) % 60
-        val h = (seconds / (60 * 60)) % 24
-        return String.format("%02d:%02d:%02d.%01d", h, m, s, ss)
     }
 }

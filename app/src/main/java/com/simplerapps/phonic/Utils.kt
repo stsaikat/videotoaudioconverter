@@ -55,3 +55,12 @@ fun showInfoDialog(
 }
 
 data class Range(var from: Int,var to: Int)
+
+fun getFormattedTrimTimeText(time: Int): String {
+    val ss = (time % 1000) / 100
+    val seconds = time / 1000
+    val s = seconds % 60
+    val m = (seconds / 60) % 60
+    val h = (seconds / (60 * 60)) % 24
+    return String.format("%02d:%02d:%02d.%01d", h, m, s, ss)
+}
