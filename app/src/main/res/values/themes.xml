@@ -2,8 +2,8 @@
     <!-- Base application theme. -->
     <style name="Theme.Phonic" parent="Theme.MaterialComponents.Light.Bridge">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/slate_blue</item>
-        <item name="colorPrimaryVariant">@color/dark_slate_blue</item>
+        <item name="colorPrimary">@color/bg_bright</item>
+        <item name="colorPrimaryVariant">@color/bg_dark</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/teal_200</item>

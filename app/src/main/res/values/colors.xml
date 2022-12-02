@@ -8,8 +8,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-    <color name="slate_blue">#FF6A5ACD</color>
-    <color name="dark_slate_blue">#FF483D8B</color>
+    <color name="bg_bright">#FF6A5ACD</color>
+    <color name="bg_dark">#FF483D8B</color>
     <color name="color_active">#FF4FFCEB</color>
     <color name="text_color_inactive">#FFD0D0D0</color>
 </resources>
