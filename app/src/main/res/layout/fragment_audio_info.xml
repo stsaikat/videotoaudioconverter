@@ -9,13 +9,15 @@
         android:id="@+id/bt_trim"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:layout_marginStart="32dp"
         android:layout_marginTop="48dp"
         android:background="@android:color/transparent"
         android:drawableTop="@drawable/ic_baseline_content_cut_24"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:drawablePadding="8dp"
         android:text="Cut"
         android:textAllCaps="false"
+        app:layout_constraintEnd_toStartOf="@+id/bt_volume"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,14 +25,32 @@
         android:id="@+id/bt_volume"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:layout_marginStart="72dp"
         android:layout_marginTop="48dp"
         android:background="@android:color/transparent"
         android:drawableTop="@drawable/ic_baseline_volume_up_24"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:drawablePadding="8dp"
         android:text="Volume"
         android:textAllCaps="false"
+        app:layout_constraintEnd_toStartOf="@+id/bt_fade"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/bt_trim"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_fade"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="48dp"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_baseline_fade_24"
+        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+        android:drawablePadding="8dp"
+        android:text="Fade"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/bt_volume"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView

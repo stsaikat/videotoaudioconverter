@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.service
+package com.simplerapps.phonic.tools
 
 import android.content.Context
 import android.media.MediaCodec
@@ -8,10 +8,10 @@ import android.media.MediaMuxer
 import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.common.ProgressListener
-import com.simplerapps.phonic.tools.AudioTranscoder
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 
@@ -137,6 +137,7 @@ class AudioConverter(
             listener.onProgress(
                 ((bufferInfo.presentationTimeUs * 100) / durationUs).toInt()
             )
+
             muxer.writeSampleData(muxerIndex, buffer, bufferInfo)
 
             extractor.advance()

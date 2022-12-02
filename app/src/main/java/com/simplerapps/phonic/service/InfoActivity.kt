@@ -13,10 +13,11 @@ import com.simplerapps.phonic.databinding.ActivityInfoBinding
 import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.share.ShareActivity
 import com.simplerapps.phonic.showInfoDialog
+import com.simplerapps.phonic.tools.AudioConverter
 import java.io.File
 import kotlin.concurrent.thread
 
-class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener,
+class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
     EditAudioFragment.Listener, ProgressListener {
     companion object {
         const val SERVICE_ID = "service_id"
@@ -59,8 +60,8 @@ class InfoActivity : AppCompatActivity(), VideoToAudioInfoFragment.Listener,
 
     private fun showVideoToAudioFragment(uri: String?) {
         uri?.let {
-            val videoToAudioInfoFragment = VideoToAudioInfoFragment(it, this)
-            showFragment(videoToAudioInfoFragment)
+            val videoToAudioFragment = VideoToAudioFragment(it, this)
+            showFragment(videoToAudioFragment)
         }
     }
 

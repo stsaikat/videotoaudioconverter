@@ -14,16 +14,13 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.innovattic.rangeseekbar.RangeSeekBar
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.FragmentVideoToAudioInfoBinding
 import com.simplerapps.phonic.fragment.AudioInfoFragment
-import java.lang.Integer.min
-import kotlin.math.max
 
-class VideoToAudioInfoFragment(private val uri: String, private val listener: Listener) :
+class VideoToAudioFragment(private val uri: String, private val listener: Listener) :
     Fragment(R.layout.fragment_video_to_audio_info), Player.Listener {
 
     private lateinit var exoplayer: ExoPlayer
