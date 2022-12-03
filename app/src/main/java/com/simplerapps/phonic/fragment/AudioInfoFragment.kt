@@ -11,15 +11,17 @@ import androidx.fragment.app.Fragment
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.bottomsheets.TrimBottomSheet
+import com.simplerapps.phonic.bottomsheets.VolumeBottomSheet
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.FragmentAudioInfoBinding
 import com.simplerapps.phonic.getFormattedTrimTimeText
 
 class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio_info),
-    TrimBottomSheet.TrimUpdateListener {
+    TrimBottomSheet.TrimUpdateListener, VolumeBottomSheet.VolumeListener {
 
     private lateinit var viewBinding: FragmentAudioInfoBinding
     private var trim: Range? = null
+    private var volume: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,13 +49,14 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
 
     private fun showTrimBottomSheet() {
         getAudioDuration()?.let {
-            val trimBottomSheet = TrimBottomSheet(it,trim, this)
+            val trimBottomSheet = TrimBottomSheet(it, trim, this)
             trimBottomSheet.show(childFragmentManager, null)
         }
     }
 
     private fun showVolumeBottomSheet() {
-
+        val volumeBottomSheet = VolumeBottomSheet(volume, this)
+        volumeBottomSheet.show(childFragmentManager, null)
     }
 
     private fun getAudioDuration(): Long? {
@@ -82,6 +85,15 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
             viewBinding.tvTrimChoosenDuration.text =
                 getFormattedTrimTimeText(it.to - it.from)
             FileInfoManager.trim = it
+        }
+    }
+
+    override fun onVolumeChange(volume: Int?) {
+        volume?.let {
+            this.volume = it
+            viewBinding.tvTrimChoosenVolume.visibility = View.VISIBLE
+            viewBinding.tvTrimChoosenVolume.text = "$it%"
+            FileInfoManager.volume = it
         }
     }
 }

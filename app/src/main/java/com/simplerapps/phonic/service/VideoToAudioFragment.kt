@@ -40,7 +40,7 @@ class VideoToAudioFragment(private val uri: String, private val listener: Listen
 
         viewBinding.btConvert.setOnClickListener {
             exoplayer.pause()
-            listener.convertVideoToAudio(uri, FileInfoManager.trim)
+            listener.convertVideoToAudio(uri, FileInfoManager.trim, FileInfoManager.volume)
         }
     }
 
@@ -106,6 +106,6 @@ class VideoToAudioFragment(private val uri: String, private val listener: Listen
     }
 
     interface Listener {
-        fun convertVideoToAudio(uri: String, trim: Range?)
+        fun convertVideoToAudio(uri: String, trim: Range?, volume: Int?)
     }
 }

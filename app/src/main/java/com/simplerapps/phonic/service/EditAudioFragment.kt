@@ -38,7 +38,7 @@ class EditAudioFragment(private val uri: String, private val listener: Listener)
 
         viewBinding.btProcess.setOnClickListener {
             exoplayer.pause()
-            listener.editAudio(uri, FileInfoManager.trim)
+            listener.editAudio(uri, FileInfoManager.trim, FileInfoManager.volume)
         }
 
         viewBinding.exoVideoPlayer.controllerShowTimeoutMs = 0
@@ -88,6 +88,6 @@ class EditAudioFragment(private val uri: String, private val listener: Listener)
     }
 
     interface Listener {
-        fun editAudio(uri: String, trim: Range?)
+        fun editAudio(uri: String, trim: Range?,volume: Int?)
     }
 }

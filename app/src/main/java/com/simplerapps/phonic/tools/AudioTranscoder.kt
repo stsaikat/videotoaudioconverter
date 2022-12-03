@@ -5,18 +5,23 @@ import android.media.*
 import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.Range
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.common.ProgressListener
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import kotlin.math.abs
+import kotlin.math.log
 
 class AudioTranscoder(
     private val context: Context,
     private val inUri: Uri,
     private val outUri: Uri,
     private val listener: ProgressListener,
-    private val trim: Range?
+    private val trim: Range? = null,
+    private val volume: Int? = null
 ) {
 
     private var extractor: MediaExtractor = MediaExtractor()
@@ -30,6 +35,7 @@ class AudioTranscoder(
     private lateinit var decoder: MediaCodec
     private lateinit var encoder: MediaCodec
     private val timeoutUs = 10000L
+    private var channels = 0
 
     init {
         trim?.let {
@@ -68,6 +74,7 @@ class AudioTranscoder(
                 if (trim == null) {
                     durationUs = format.getLong(MediaFormat.KEY_DURATION)
                 }
+                channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
                 decoder = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
                 decoder.configure(format, null, null, 0)
 
@@ -124,8 +131,7 @@ class AudioTranscoder(
 
                     val endFlag = if (trim != null) {
                         extractor.sampleTime > trim.to * 1000
-                    }
-                    else {
+                    } else {
                         false
                     }
 
@@ -192,9 +198,25 @@ class AudioTranscoder(
                         val inBufferId = encoder.dequeueInputBuffer(timeoutUs)
                         val inBuffer = encoder.getInputBuffer(inBufferId)
 
-                        if (outBuffer != null) {
-                            inBuffer?.put(outBuffer)
+                        outBuffer?.let { mOutBuffer ->
+                            if (volume != null && abs(volume - 100) > 10) {
+                                val shortSamples = mOutBuffer.order(ByteOrder.nativeOrder()).asShortBuffer()
+                                val size = shortSamples.remaining()
+
+                                for (i in 0 until size) {
+                                    var sample = shortSamples.get()
+
+                                    // adjust volume
+                                    sample = (sample * volume / 100f).toInt().toShort()
+
+                                    // Put processed sample into encoder's buffer
+                                    inBuffer?.putShort(sample)
+                                }
+                            } else {
+                                inBuffer?.put(mOutBuffer)
+                            }
                         }
+
 
                         // Feed encoder
                         encoder.queueInputBuffer(
@@ -208,7 +230,7 @@ class AudioTranscoder(
                         decoder.releaseOutputBuffer(decoderOutBufferId, false)
 
                         // Did we get all output from decoder?
-                        if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0){
+                        if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                             allInputDecoded = true
                         }
 
@@ -267,7 +289,12 @@ class AudioTranscoder(
         )
         outputFormat.setInteger(
             MediaFormat.KEY_BIT_RATE,
-            inputFormat.getInteger(MediaFormat.KEY_BIT_RATE)
+            try {
+                inputFormat.getInteger(MediaFormat.KEY_BIT_RATE)
+            }
+            catch (e: NullPointerException) {
+                2000000
+            }
         )
         outputFormat.setInteger(
             MediaFormat.KEY_CHANNEL_COUNT,

@@ -84,7 +84,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
         }
     }
 
-    override fun convertVideoToAudio(uri: String, trim: Range?) {
+    override fun convertVideoToAudio(uri: String, trim: Range?, volume: Int?) {
         convertProgressDialog.show(supportFragmentManager, null)
 
         thread(start = true) {
@@ -97,7 +97,8 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
                 Uri.parse(uri),
                 outUri,
                 this,
-                trim
+                trim,
+                volume
             )
 
             audioConverter.convert()
@@ -105,7 +106,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
 
     }
 
-    override fun editAudio(uri: String, trim: Range?) {
+    override fun editAudio(uri: String, trim: Range?, volume: Int?) {
         convertProgressDialog.show(supportFragmentManager, null)
 
         thread(start = true) {
@@ -118,7 +119,8 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
                 Uri.parse(uri),
                 outUri,
                 this,
-                trim
+                trim,
+                volume
             )
 
             audioTranscoder.convert()

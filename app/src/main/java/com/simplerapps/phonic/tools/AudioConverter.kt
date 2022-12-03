@@ -20,7 +20,8 @@ class AudioConverter(
     private val uri: Uri,
     private val outputUri: Uri,
     private val listener: ProgressListener,
-    private val trim: Range?
+    private val trim: Range?,
+    private val volume: Int? = null
 ) {
 
     private var extractor: MediaExtractor = MediaExtractor()
@@ -39,6 +40,12 @@ class AudioConverter(
     }
 
     fun convert() {
+
+        if (volume != null) {
+            startTranscoderFlow()
+            return
+        }
+
         sourcePFD = context.contentResolver.openFileDescriptor(uri, "r")
         desPFD = context.contentResolver.openFileDescriptor(outputUri, "w")
 
@@ -180,7 +187,8 @@ class AudioConverter(
             uri,
             outputUri,
             listener,
-            trim
+            trim,
+            volume
         )
         audioTranscoder.process()
     }
