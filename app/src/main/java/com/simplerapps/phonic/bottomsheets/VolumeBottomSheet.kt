@@ -7,9 +7,10 @@ import android.view.ViewGroup
 import android.widget.SeekBar
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.simplerapps.phonic.databinding.BottomSheetVolumeBinding
+import com.simplerapps.phonic.view.VolumeProgressBarView
 
 class VolumeBottomSheet(val initialVolume: Int? = null, val listener: VolumeListener) :
-    BottomSheetDialogFragment(), SeekBar.OnSeekBarChangeListener {
+    BottomSheetDialogFragment(), VolumeProgressBarView.OnVolumeChangedListener {
 
     private lateinit var viewBinding: BottomSheetVolumeBinding
     private var volume: Int? = null
@@ -27,13 +28,14 @@ class VolumeBottomSheet(val initialVolume: Int? = null, val listener: VolumeList
         super.onStart()
         initListeners()
         if (initialVolume != null) {
-            viewBinding.sbVolumeChange.progress = initialVolume
             volume = initialVolume
+            viewBinding.cvVolumeProgressBar.currentValue = initialVolume
         }
         else {
-            viewBinding.sbVolumeChange.progress = 100
+            viewBinding.cvVolumeProgressBar.currentValue = 100
             volume = 100
         }
+        isCancelable = false
     }
 
     private fun initListeners() {
@@ -45,25 +47,15 @@ class VolumeBottomSheet(val initialVolume: Int? = null, val listener: VolumeList
         viewBinding.tvbVolumeCancel.setOnClickListener {
             dismiss()
         }
-        viewBinding.sbVolumeChange.setOnSeekBarChangeListener(this)
-    }
-
-    override fun onProgressChanged(seekBar: SeekBar?, volume: Int, fromUser: Boolean) {
-        if (fromUser) {
-            this.volume = volume
-        }
-        viewBinding.tvChoosenVolume.text = "$volume%"
-    }
-
-    override fun onStartTrackingTouch(p0: SeekBar?) {
-
-    }
-
-    override fun onStopTrackingTouch(p0: SeekBar?) {
-
+        viewBinding.cvVolumeProgressBar.setVolumeListener(this)
     }
 
     interface VolumeListener {
         fun onVolumeChange(volume: Int?)
+    }
+
+    override fun onVolumeChange(volume: Int) {
+        this.volume = volume
+        viewBinding.tvChoosenVolume.text = "$volume%"
     }
 }
