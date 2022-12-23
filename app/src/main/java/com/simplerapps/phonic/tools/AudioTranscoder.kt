@@ -5,6 +5,7 @@ import android.media.*
 import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
+import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.common.ProgressListener
@@ -87,20 +88,31 @@ class AudioTranscoder(
         return null
     }
 
-    private fun initDecoderEncoder(audioFormat: MediaFormat): Boolean {
-        if (trim == null) {
-            durationUs = audioFormat.getLong(MediaFormat.KEY_DURATION)
-        }
+    private fun initDecoder(audioFormat: MediaFormat) : Boolean {
         channels = audioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
         decoder = MediaCodec.createDecoderByType(audioFormat.getString(MediaFormat.KEY_MIME)!!)
         decoder.configure(audioFormat, null, null, 0)
         decoder.start()
 
-        val outputFormat = getOutputFormat(decoder.outputFormat)
+        return true
+    }
 
-        encoder = MediaCodec.createEncoderByType(outputFormat.getString(MediaFormat.KEY_MIME)!!)
-        encoder.configure(outputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+    private fun initEncoder(audioFormat: MediaFormat) : Boolean {
+        encoder = MediaCodec.createEncoderByType(audioFormat.getString(MediaFormat.KEY_MIME)!!)
+        encoder.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         encoder.start()
+
+        return true
+    }
+
+    private fun initDecoderEncoder(audioFormat: MediaFormat): Boolean {
+        if (trim == null) {
+            durationUs = audioFormat.getLong(MediaFormat.KEY_DURATION)
+        }
+
+        initDecoder(audioFormat)
+        val outputFormat = getOutputFormat(audioFormat)
+        initEncoder(outputFormat)
 
         return true
     }
@@ -177,13 +189,15 @@ class AudioTranscoder(
         }
     }
 
+    private fun getCurrentProgress() : Int = ((bufferInfo.presentationTimeUs * 100) / durationUs).toInt()
+
     private fun drainEncoderAndMux(bufferId: Int) {
         if (bufferId >= 0) {
             val encodedBuffer = encoder.getOutputBuffer(bufferId)!!
             muxEncodedBuffer(encodedBuffer)
             encoder.releaseOutputBuffer(bufferId, false)
 
-            listener.onProgress(((bufferInfo.presentationTimeUs * 100) / durationUs).toInt())
+            listener.onProgress(getCurrentProgress())
 
             // Are we finished here?
             if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
