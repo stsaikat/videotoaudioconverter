@@ -21,12 +21,10 @@ class AdManager {
                     override fun onAdFailedToLoad(error: LoadAdError) {
                         super.onAdFailedToLoad(error)
                         rewardedAd = null
-                        LogD("ad load failed with ${error.responseInfo}")
                     }
 
                     override fun onAdLoaded(ad: RewardedAd) {
                         super.onAdLoaded(ad)
-                        LogD("ad loaded!")
                         rewardedAd = ad
                     }
                 }
