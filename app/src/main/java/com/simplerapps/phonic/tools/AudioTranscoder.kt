@@ -13,7 +13,6 @@ import java.io.FileDescriptor
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import kotlin.math.abs
-import kotlin.math.log
 
 class AudioTranscoder(
     private val context: Context,
@@ -36,11 +35,13 @@ class AudioTranscoder(
     private lateinit var encoder: MediaCodec
     private val timeoutUs = 10000L
     private var channels = 0
+    private var lastMuxerPresentationUs = 0L
 
     init {
         trim?.let {
             durationUs = (trim.to - trim.from) * 1000L
         }
+        lastMuxerPresentationUs = 0
     }
 
     fun process() {
@@ -77,12 +78,13 @@ class AudioTranscoder(
                 channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
                 decoder = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
                 decoder.configure(format, null, null, 0)
+                decoder.start()
 
-                val outputFormat = getOutputFormat(format)
+                val outputFormat = getOutputFormat(decoder.outputFormat)
 
-                encoder =
-                    MediaCodec.createEncoderByType(outputFormat.getString(MediaFormat.KEY_MIME)!!)
+                encoder = MediaCodec.createEncoderByType(outputFormat.getString(MediaFormat.KEY_MIME)!!)
                 encoder.configure(outputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                encoder.start()
 
                 break
             }
@@ -92,9 +94,6 @@ class AudioTranscoder(
             onConversionFailed("No Audio Found!")
             return
         }
-
-        decoder.start()
-        encoder.start()
 
         muxer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
@@ -119,6 +118,8 @@ class AudioTranscoder(
                 extractor.advance()
             }
         }
+
+        LogD("${extractor.sampleTime}")
 
         while (!allOutputEncoded) {
 
@@ -168,7 +169,15 @@ class AudioTranscoder(
 
                     val encodedBuffer = encoder.getOutputBuffer(encoderOutBufferId)!!
 
-                    muxer.writeSampleData(trackIndex, encodedBuffer, bufferInfo)
+                    try {
+                        muxer.writeSampleData(trackIndex, encodedBuffer, bufferInfo)
+                        lastMuxerPresentationUs = bufferInfo.presentationTimeUs
+                    }
+                    catch (e: IllegalStateException) {
+                        LogD("${bufferInfo.presentationTimeUs} $lastMuxerPresentationUs $durationUs")
+                    }
+
+
                     encoder.releaseOutputBuffer(encoderOutBufferId, false)
 
                     listener.onProgress(
@@ -243,7 +252,12 @@ class AudioTranscoder(
 
         release()
         listener.onFinish(outUri.toString())
+
+        LogD("$mxSample $mnSample")
     }
+
+    var mxSample = 0
+    var mnSample = 1000000
 
     private fun release() {
         sourcePFD?.close()
