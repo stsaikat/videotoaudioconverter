@@ -44,68 +44,70 @@ class AudioTranscoder(
         lastMuxerPresentationUs = 0
     }
 
-    fun process() {
-
+    private fun initSources() : Boolean {
         sourcePFD = context.contentResolver.openFileDescriptor(inUri, "r")
         desPFD = context.contentResolver.openFileDescriptor(outUri, "w")
 
         if (sourcePFD == null || desPFD == null) {
-            onConversionFailed()
-            return
+            return false
         }
 
         sourceFD = sourcePFD!!.fileDescriptor
         desFD = desPFD!!.fileDescriptor
 
         if (!sourceFD.valid() || !desFD.valid()) {
-            onConversionFailed()
-            return
+            return false
         }
 
         extractor.setDataSource(sourceFD)
 
-        var trackNo = -1
+        return true
+    }
+
+    private fun getInputAudioFormat() : MediaFormat? {
         for (i in 0 until extractor.trackCount) {
             val format = extractor.getTrackFormat(i)
             val mimeType = format.getString(MediaFormat.KEY_MIME)!!
             if (mimeType.startsWith("audio/")) {
                 FileInfoManager.mimeType = mimeType
                 extractor.selectTrack(i)
-                trackNo = i
-                if (trim == null) {
-                    durationUs = format.getLong(MediaFormat.KEY_DURATION)
-                }
-                channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
-                decoder = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME)!!)
-                decoder.configure(format, null, null, 0)
-                decoder.start()
-
-                val outputFormat = getOutputFormat(decoder.outputFormat)
-
-                encoder = MediaCodec.createEncoderByType(outputFormat.getString(MediaFormat.KEY_MIME)!!)
-                encoder.configure(outputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-                encoder.start()
-
-                break
+                return format
             }
         }
 
-        if (trackNo == -1) {
-            onConversionFailed("No Audio Found!")
-            return
-        }
+        return null
+    }
 
+    private fun initDecoderEncoder(audioFormat: MediaFormat) : Boolean {
+        if (trim == null) {
+            durationUs = audioFormat.getLong(MediaFormat.KEY_DURATION)
+        }
+        channels = audioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
+        decoder = MediaCodec.createDecoderByType(audioFormat.getString(MediaFormat.KEY_MIME)!!)
+        decoder.configure(audioFormat, null, null, 0)
+        decoder.start()
+
+        val outputFormat = getOutputFormat(decoder.outputFormat)
+
+        encoder = MediaCodec.createEncoderByType(outputFormat.getString(MediaFormat.KEY_MIME)!!)
+        encoder.configure(outputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+        encoder.start()
+
+        return true
+    }
+
+    private fun initMuxer() : Boolean {
         muxer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         } else {
-            val path = outUri.path
-            if (path == null) {
-                onConversionFailed()
-                return
-            }
+            val path = outUri.path ?: return false
             MediaMuxer(path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         }
 
+        return true
+    }
+
+    private fun runTranscodeFlow() {
         var allInputExtracted = false
         var allInputDecoded = false
         var allOutputEncoded = false
@@ -118,8 +120,6 @@ class AudioTranscoder(
                 extractor.advance()
             }
         }
-
-        LogD("${extractor.sampleTime}")
 
         while (!allOutputEncoded) {
 
@@ -249,15 +249,37 @@ class AudioTranscoder(
                 }
             }
         }
-
-        release()
-        listener.onFinish(outUri.toString())
-
-        LogD("$mxSample $mnSample")
     }
 
-    var mxSample = 0
-    var mnSample = 1000000
+    fun process() {
+
+        if (!initSources()) {
+            onConversionFailed()
+            return
+        }
+
+        val inputAudioFormat = getInputAudioFormat()
+
+        if (inputAudioFormat == null) {
+            onConversionFailed("No Audio Found!")
+            return
+        }
+
+        if (!initDecoderEncoder(inputAudioFormat)) {
+            onConversionFailed()
+            return
+        }
+
+        if (!initMuxer()) {
+            onConversionFailed()
+            return
+        }
+
+        runTranscodeFlow()
+        release()
+
+        listener.onFinish(outUri.toString())
+    }
 
     private fun release() {
         sourcePFD?.close()
