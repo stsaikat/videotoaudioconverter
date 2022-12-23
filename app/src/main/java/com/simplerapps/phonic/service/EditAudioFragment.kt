@@ -13,7 +13,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.simplerapps.phonic.R
-import com.simplerapps.phonic.Range
+import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.FragmentEditAudioBinding
 import com.simplerapps.phonic.fragment.AudioInfoFragment
@@ -88,6 +88,6 @@ class EditAudioFragment(private val uri: String, private val listener: Listener)
     }
 
     interface Listener {
-        fun editAudio(uri: String, trim: Range?,volume: Int?)
+        fun editAudio(uri: String, trim: TrimRange?, volume: Int?)
     }
 }

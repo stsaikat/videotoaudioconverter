@@ -8,8 +8,7 @@ import android.media.MediaMuxer
 import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import com.simplerapps.phonic.LogD
-import com.simplerapps.phonic.Range
+import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.common.ProgressListener
 import java.io.FileDescriptor
@@ -20,7 +19,7 @@ class AudioConverter(
     private val uri: Uri,
     private val outputUri: Uri,
     private val listener: ProgressListener,
-    private val trim: Range?,
+    private val trim: TrimRange?,
     private val volume: Int? = null
 ) {
 

@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import com.simplerapps.phonic.Range
+import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.common.ProgressListener
 import com.simplerapps.phonic.databinding.ActivityInfoBinding
@@ -84,7 +84,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
         }
     }
 
-    override fun convertVideoToAudio(uri: String, trim: Range?, volume: Int?) {
+    override fun convertVideoToAudio(uri: String, trim: TrimRange?, volume: Int?) {
         convertProgressDialog.show(supportFragmentManager, null)
 
         thread(start = true) {
@@ -106,7 +106,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
 
     }
 
-    override fun editAudio(uri: String, trim: Range?, volume: Int?) {
+    override fun editAudio(uri: String, trim: TrimRange?, volume: Int?) {
         convertProgressDialog.show(supportFragmentManager, null)
 
         thread(start = true) {

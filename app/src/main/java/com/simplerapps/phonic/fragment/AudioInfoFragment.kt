@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.simplerapps.phonic.R
-import com.simplerapps.phonic.Range
+import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.bottomsheets.TrimBottomSheet
 import com.simplerapps.phonic.bottomsheets.VolumeBottomSheet
 import com.simplerapps.phonic.common.FileInfoManager
@@ -20,7 +20,7 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
     TrimBottomSheet.TrimUpdateListener, VolumeBottomSheet.VolumeListener {
 
     private lateinit var viewBinding: FragmentAudioInfoBinding
-    private var trim: Range? = null
+    private var trim: TrimRange? = null
     private var volume: Int? = null
 
     override fun onCreateView(
@@ -78,7 +78,7 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
         return duration
     }
 
-    override fun onTrimUpdate(trim: Range?) {
+    override fun onTrimUpdate(trim: TrimRange?) {
         trim?.let {
             this.trim = it
             viewBinding.tvTrimChoosenDuration.visibility = View.VISIBLE

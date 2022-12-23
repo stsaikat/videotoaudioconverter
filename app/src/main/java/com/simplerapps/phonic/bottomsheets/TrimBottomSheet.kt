@@ -6,20 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.innovattic.rangeseekbar.RangeSeekBar
-import com.simplerapps.phonic.Range
+import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.databinding.BottomSheetTrimBinding
 import com.simplerapps.phonic.getFormattedTrimTimeText
 import kotlin.math.max
 
 class TrimBottomSheet(
     private val totalDuration: Long,
-    private val currentTrim: Range?,
+    private val currentTrim: TrimRange?,
     private val listener: TrimUpdateListener
 ) :
     BottomSheetDialogFragment(), RangeSeekBar.SeekBarChangeListener {
 
     private lateinit var viewBinding: BottomSheetTrimBinding
-    private var audioTrimRange: Range? = null
+    private var audioTrimTrimRange: TrimRange? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,7 +50,7 @@ class TrimBottomSheet(
         }
     }
 
-    private fun inflateCurrentTrim(trim: Range) {
+    private fun inflateCurrentTrim(trim: TrimRange) {
         viewBinding.rsbTrim.setMinThumbValue(trim.from)
         viewBinding.rsbTrim.setMaxThumbValue(trim.to)
     }
@@ -62,7 +62,7 @@ class TrimBottomSheet(
         }
 
         viewBinding.tvbTrimDone.setOnClickListener {
-            listener.onTrimUpdate(audioTrimRange)
+            listener.onTrimUpdate(audioTrimTrimRange)
             dismiss()
         }
 
@@ -104,7 +104,7 @@ class TrimBottomSheet(
     }
 
     private fun processTrimTime(startMs: Int, endMs: Int) {
-        audioTrimRange = Range(startMs, endMs)
+        audioTrimTrimRange = TrimRange(startMs, endMs)
         setStartText(startMs)
         setEndText(endMs)
         setDurationText(endMs - startMs)
@@ -139,6 +139,6 @@ class TrimBottomSheet(
     }
 
     interface TrimUpdateListener {
-        fun onTrimUpdate(trim: Range?)
+        fun onTrimUpdate(trim: TrimRange?)
     }
 }

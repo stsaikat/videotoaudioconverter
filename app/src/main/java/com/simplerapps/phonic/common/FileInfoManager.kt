@@ -1,7 +1,7 @@
 package com.simplerapps.phonic.common
 
 import android.net.Uri
-import com.simplerapps.phonic.Range
+import com.simplerapps.phonic.TrimRange
 
 class FileInfoManager {
     companion object {
@@ -12,7 +12,7 @@ class FileInfoManager {
         @Volatile var fileExtension: String? = null
         @Volatile var savedFileUri: Uri? = null
         @Volatile var savedFileName: String? = null
-        @Volatile var trim: Range? = null
+        @Volatile var trim: TrimRange? = null
         @Volatile var volume: Int? = null
         const val cacheName: String = "audio.m4a"
     }
