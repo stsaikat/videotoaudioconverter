@@ -5,7 +5,6 @@ import android.media.*
 import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.common.ProgressListener
@@ -33,7 +32,7 @@ class AudioTranscoder(
     private var durationUs = 0L
     private lateinit var decoder: MediaCodec
     private lateinit var encoder: MediaCodec
-    private val timeoutUs = 10000L
+    private val timeoutUs = 100L
     private var channels = 0
     private var lastMuxerPresentationUs = 0L
 
@@ -111,8 +110,22 @@ class AudioTranscoder(
         }
 
         initDecoder(audioFormat)
-        val outputFormat = getOutputFormat(audioFormat)
-        initEncoder(outputFormat)
+
+        val formatChangeWaitTimeStartMs = System.currentTimeMillis()
+
+        while (true) {
+            feedInputToDecoder()
+            val bufferId = decoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
+            if (bufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                val outputFormat = getOutputFormat(decoder.outputFormat)
+                initEncoder(outputFormat)
+                break
+            }
+
+            if (System.currentTimeMillis() - formatChangeWaitTimeStartMs > 10000L) {
+                return false
+            }
+        }
 
         return true
     }
@@ -233,36 +246,40 @@ class AudioTranscoder(
 
     private fun feedEncoder(buffer: ByteBuffer?) {
         val inBufferId = encoder.dequeueInputBuffer(timeoutUs)
-        val inBuffer = encoder.getInputBuffer(inBufferId)
+        val inBuffer = try {
+            encoder.getInputBuffer(inBufferId)
+        }
+        catch (e: IllegalStateException) {
+            null
+        }
 
         if (buffer != null && inBuffer != null) {
             transcodeBuffer(buffer, inBuffer)
+            // Feed encoder
+            encoder.queueInputBuffer(
+                inBufferId,
+                bufferInfo.offset,
+                bufferInfo.size,
+                bufferInfo.presentationTimeUs,
+                bufferInfo.flags
+            )
         }
-
-        // Feed encoder
-        encoder.queueInputBuffer(
-            inBufferId,
-            bufferInfo.offset,
-            bufferInfo.size,
-            bufferInfo.presentationTimeUs,
-            bufferInfo.flags
-        )
     }
 
     private fun drainDecoderAndFeedEncoder() {
         if (!allInputDecoded) {
-            val decoderOutBufferId = decoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
-            if (decoderOutBufferId >= 0) {
-                val outBuffer = decoder.getOutputBuffer(decoderOutBufferId)
+            val bufferId = decoder.dequeueOutputBuffer(bufferInfo, timeoutUs)
+            if (bufferId >= 0) {
+                val outBuffer = decoder.getOutputBuffer(bufferId)
                 feedEncoder(outBuffer)
-                decoder.releaseOutputBuffer(decoderOutBufferId, false)
+                decoder.releaseOutputBuffer(bufferId, false)
 
                 // Did we get all output from decoder?
                 if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     allInputDecoded = true
                 }
 
-            } else if (decoderOutBufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
+            } else if (bufferId == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 decoderOutputAvailable = false
             }
         }
