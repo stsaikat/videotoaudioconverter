@@ -34,7 +34,6 @@ class AudioTranscoder(
     private lateinit var encoder: MediaCodec
     private val timeoutUs = 100L
     private var channels = 0
-    private var lastMuxerPresentationUs = 0L
 
     private var allInputExtracted = false
     private var allInputDecoded = false
@@ -50,7 +49,6 @@ class AudioTranscoder(
         trim?.let {
             durationUs = (trim.to - trim.from) * 1000L
         }
-        lastMuxerPresentationUs = 0
     }
 
     private fun initSources(): Boolean {
@@ -87,7 +85,7 @@ class AudioTranscoder(
         return null
     }
 
-    private fun initDecoder(audioFormat: MediaFormat) : Boolean {
+    private fun initDecoder(audioFormat: MediaFormat): Boolean {
         channels = audioFormat.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
         decoder = MediaCodec.createDecoderByType(audioFormat.getString(MediaFormat.KEY_MIME)!!)
         decoder.configure(audioFormat, null, null, 0)
@@ -96,7 +94,7 @@ class AudioTranscoder(
         return true
     }
 
-    private fun initEncoder(audioFormat: MediaFormat) : Boolean {
+    private fun initEncoder(audioFormat: MediaFormat): Boolean {
         encoder = MediaCodec.createEncoderByType(audioFormat.getString(MediaFormat.KEY_MIME)!!)
         encoder.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         encoder.start()
@@ -195,14 +193,16 @@ class AudioTranscoder(
     private fun muxEncodedBuffer(buffer: ByteBuffer): Boolean {
         return try {
             muxer.writeSampleData(trackIndex, buffer, bufferInfo)
-            lastMuxerPresentationUs = bufferInfo.presentationTimeUs
             true
         } catch (e: IllegalStateException) {
+            false
+        } catch (e: IllegalArgumentException) {
             false
         }
     }
 
-    private fun getCurrentProgress() : Int = ((bufferInfo.presentationTimeUs * 100) / durationUs).toInt()
+    private fun getCurrentProgress(): Int =
+        ((bufferInfo.presentationTimeUs * 100) / durationUs).toInt()
 
     private fun drainEncoderAndMux(bufferId: Int) {
         if (bufferId >= 0) {
@@ -248,8 +248,7 @@ class AudioTranscoder(
         val inBufferId = encoder.dequeueInputBuffer(timeoutUs)
         val inBuffer = try {
             encoder.getInputBuffer(inBufferId)
-        }
-        catch (e: IllegalStateException) {
+        } catch (e: IllegalStateException) {
             null
         }
 

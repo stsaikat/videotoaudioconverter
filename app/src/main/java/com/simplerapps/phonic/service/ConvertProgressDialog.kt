@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.simplerapps.phonic.R
+import kotlin.math.max
 
 class ConvertProgressDialog() : DialogFragment() {
 
@@ -28,13 +29,15 @@ class ConvertProgressDialog() : DialogFragment() {
     }
 
     fun setProgress(progress: Int) {
+        var modProgress = progress
         if (this::progressBar.isInitialized) {
-            progressBar.progress = progress
+            modProgress = max(modProgress,progress)
+            progressBar.progress = modProgress
         }
 
         if (this::progressPercent.isInitialized) {
             handler.post {
-                "$progress%".also { progressPercent.text = it }
+                "$modProgress%".also { progressPercent.text = it }
             }
         }
     }
