@@ -2,12 +2,12 @@ package com.simplerapps.phonic.view
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.simplerapps.phonic.LogD
+import androidx.core.content.res.ResourcesCompat
+import com.simplerapps.phonic.R
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
@@ -30,7 +30,7 @@ class VolumeProgressBarView(context: Context, attrs: AttributeSet) : View(contex
     private val linePaint = Paint().apply {
         strokeWidth = 10f
         style = Paint.Style.STROKE
-        color = Color.WHITE
+        color = ResourcesCompat.getColor(context.resources, R.color.color_active, null)
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
     }
@@ -41,7 +41,7 @@ class VolumeProgressBarView(context: Context, attrs: AttributeSet) : View(contex
             //mCanvas.drawColor(Color.TRANSPARENT)
             val startY = height / 6f
             val endY = 5 * height / 6f
-            for (i in 2 until width - 2*linePaint.strokeWidth.toInt() step 5 * linePaint.strokeWidth.toInt()) {
+            for (i in 2 until width - 2 * linePaint.strokeWidth.toInt() step 5 * linePaint.strokeWidth.toInt()) {
                 val x = ((i + tranX + width) % width).toFloat()
                 linePaint.alpha = (255 * sin(x / width * Math.PI)).toInt()
                 mCanvas.drawLine(
@@ -61,7 +61,7 @@ class VolumeProgressBarView(context: Context, attrs: AttributeSet) : View(contex
         postInvalidate()
 
         var vol = (currentValue + tranX / 20)
-        vol = max(0,vol)
+        vol = max(0, vol)
         vol = min(vol, maxValue)
 
         if (vol != tempCurrent) {

@@ -46,6 +46,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="8dp"
             android:text="message"
+            android:textColor="@color/text_color_active"
             app:layout_constraintBottom_toTopOf="@+id/tv_ok"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

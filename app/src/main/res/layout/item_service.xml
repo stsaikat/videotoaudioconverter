@@ -28,6 +28,7 @@
                 android:layout_margin="16dp"
                 android:text="name"
                 android:textAlignment="center"
+                android:textColor="@color/color_active"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"

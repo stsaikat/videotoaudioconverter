@@ -32,6 +32,7 @@
         android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:padding="8dp"
         android:text="Cancel"
+        android:textColor="@color/text_color_active"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

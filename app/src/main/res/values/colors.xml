@@ -8,8 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     
-    <color name="bg_bright">#FF6A5ACD</color>
-    <color name="bg_dark">#FF483D8B</color>
-    <color name="color_active">#FF4FFCEB</color>
+    <color name="bg_bright">#FFFFFFFF</color>
+    <color name="bg_dark">#FFDDDDDD</color>
+    <color name="color_active">#FFFF1A1A</color>
     <color name="text_color_inactive">#FFD0D0D0</color>
+    <color name="text_color_active">#FF000000</color>
 </resources>

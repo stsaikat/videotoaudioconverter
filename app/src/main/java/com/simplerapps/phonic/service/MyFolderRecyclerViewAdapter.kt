@@ -37,7 +37,7 @@ class MyFolderRecyclerViewAdapter(
             if (position == currentPlayingPosition) {
                 holder.itemView.context.resources.getColor(R.color.color_active,null)
             } else {
-                Color.WHITE
+                holder.itemView.context.resources.getColor(R.color.text_color_active,null)
             }
         )
 
