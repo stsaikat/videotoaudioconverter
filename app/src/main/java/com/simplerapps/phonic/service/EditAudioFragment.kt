@@ -16,6 +16,7 @@ import com.simplerapps.phonic.R
 import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.FragmentEditAudioBinding
+import com.simplerapps.phonic.datamodel.AudioConversionInfo
 import com.simplerapps.phonic.fragment.AudioInfoFragment
 
 class EditAudioFragment(private val uri: String, private val listener: Listener) :
@@ -38,7 +39,15 @@ class EditAudioFragment(private val uri: String, private val listener: Listener)
 
         viewBinding.btProcess.setOnClickListener {
             exoplayer.pause()
-            listener.editAudio(uri, FileInfoManager.trim, FileInfoManager.volume)
+            listener.editAudio(
+                AudioConversionInfo(
+                    uri = Uri.parse(uri),
+                    trim = FileInfoManager.trim,
+                    volume = FileInfoManager.volume,
+                    fadeInMs = FileInfoManager.fadeInMs,
+                    fadeOutMs = FileInfoManager.fadeOutMs
+                )
+            )
         }
 
         viewBinding.exoVideoPlayer.controllerShowTimeoutMs = 0
@@ -88,6 +97,6 @@ class EditAudioFragment(private val uri: String, private val listener: Listener)
     }
 
     interface Listener {
-        fun editAudio(uri: String, trim: TrimRange?, volume: Int?)
+        fun editAudio(audioConversionInfo: AudioConversionInfo)
     }
 }

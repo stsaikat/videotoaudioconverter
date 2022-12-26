@@ -13,7 +13,9 @@ class FileInfoManager {
         @Volatile var savedFileUri: Uri? = null
         @Volatile var savedFileName: String? = null
         @Volatile var trim: TrimRange? = null
-        @Volatile var volume: Int? = null
+        @Volatile var volume: Int = 100
+        @Volatile var fadeInMs = 0
+        @Volatile var fadeOutMs = 0
         const val cacheName: String = "audio.m4a"
     }
 }

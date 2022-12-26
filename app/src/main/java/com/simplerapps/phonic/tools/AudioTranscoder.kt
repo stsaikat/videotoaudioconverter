@@ -2,24 +2,18 @@ package com.simplerapps.phonic.tools
 
 import android.content.Context
 import android.media.*
-import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import com.simplerapps.phonic.TrimRange
+import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.common.FileInfoManager
-import com.simplerapps.phonic.common.ProgressListener
+import com.simplerapps.phonic.datamodel.AudioConversionInfo
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import kotlin.math.abs
 
 class AudioTranscoder(
     private val context: Context,
-    private val inUri: Uri,
-    private val outUri: Uri,
-    private val listener: ProgressListener,
-    private val trim: TrimRange? = null,
-    private val volume: Int? = null
+    private val audioConversionInfo: AudioConversionInfo
 ) {
 
     private var extractor: MediaExtractor = MediaExtractor()
@@ -46,14 +40,14 @@ class AudioTranscoder(
     private var trackIndex = -1
 
     init {
-        trim?.let {
+        audioConversionInfo.trim?.let { trim ->
             durationUs = (trim.to - trim.from) * 1000L
         }
     }
 
     private fun initSources(): Boolean {
-        sourcePFD = context.contentResolver.openFileDescriptor(inUri, "r")
-        desPFD = context.contentResolver.openFileDescriptor(outUri, "w")
+        sourcePFD = context.contentResolver.openFileDescriptor(audioConversionInfo.uri, "r")
+        desPFD = context.contentResolver.openFileDescriptor(audioConversionInfo.outputUri, "w")
 
         if (sourcePFD == null || desPFD == null) {
             return false
@@ -103,7 +97,7 @@ class AudioTranscoder(
     }
 
     private fun initDecoderEncoder(audioFormat: MediaFormat): Boolean {
-        if (trim == null) {
+        if (audioConversionInfo.trim == null) {
             durationUs = audioFormat.getLong(MediaFormat.KEY_DURATION)
         }
 
@@ -132,7 +126,7 @@ class AudioTranscoder(
         muxer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         } else {
-            val path = outUri.path ?: return false
+            val path = audioConversionInfo.outputUri.path ?: return false
             MediaMuxer(path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         }
 
@@ -147,7 +141,7 @@ class AudioTranscoder(
         trackIndex = -1
 
 
-        trim?.let {
+        audioConversionInfo.trim?.let {
             while (extractor.sampleTime < it.from * 1000) {
                 extractor.advance()
             }
@@ -161,8 +155,8 @@ class AudioTranscoder(
                 val buffer = decoder.getInputBuffer(inBufferId)!!
                 val sampleSize = extractor.readSampleData(buffer, 0)
 
-                val endFlag = if (trim != null) {
-                    extractor.sampleTime > trim.to * 1000
+                val endFlag = if (audioConversionInfo.trim != null) {
+                    extractor.sampleTime > audioConversionInfo.trim!!.to * 1000
                 } else {
                     false
                 }
@@ -170,10 +164,10 @@ class AudioTranscoder(
                 if (sampleSize >= 0 && !endFlag) {
                     decoder.queueInputBuffer(
                         inBufferId, 0, sampleSize,
-                        if (trim == null) {
+                        if (audioConversionInfo.trim == null) {
                             extractor.sampleTime
                         } else {
-                            extractor.sampleTime - trim.from * 1000
+                            extractor.sampleTime - audioConversionInfo.trim!!.from * 1000
                         },
                         extractor.sampleFlags
                     )
@@ -210,7 +204,7 @@ class AudioTranscoder(
             muxEncodedBuffer(encodedBuffer)
             encoder.releaseOutputBuffer(bufferId, false)
 
-            listener.onProgress(getCurrentProgress())
+            audioConversionInfo.listener?.onProgress(getCurrentProgress())
 
             // Are we finished here?
             if ((bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
@@ -225,8 +219,19 @@ class AudioTranscoder(
         }
     }
 
-    private fun transcodeBuffer(fromBuffer: ByteBuffer, toBuffer: ByteBuffer) {
-        if (volume != null && abs(volume - 100) > 10) {
+    private fun transcodeBuffer(fromBuffer: ByteBuffer, toBuffer: ByteBuffer, pts: Long) {
+        if (audioConversionInfo.isVolumeChangeNeeded() || audioConversionInfo.isFadeNeeded()) {
+            var volume = audioConversionInfo.volume.toFloat()
+            if (pts < audioConversionInfo.fadeInMs * 1000) {
+                volume *= (pts / 1000f) / audioConversionInfo.fadeInMs
+            }
+            else if (pts > durationUs - audioConversionInfo.fadeOutMs * 1000) {
+                val rem = durationUs - pts
+                volume *= (rem / 1000f) / audioConversionInfo.fadeOutMs
+            }
+
+            LogD("$pts $volume ${audioConversionInfo.volume}")
+
             val shortSamples = fromBuffer.order(ByteOrder.nativeOrder()).asShortBuffer()
             val size = shortSamples.remaining()
 
@@ -253,7 +258,7 @@ class AudioTranscoder(
         }
 
         if (buffer != null && inBuffer != null) {
-            transcodeBuffer(buffer, inBuffer)
+            transcodeBuffer(buffer, inBuffer, bufferInfo.presentationTimeUs)
             // Feed encoder
             encoder.queueInputBuffer(
                 inBufferId,
@@ -335,7 +340,7 @@ class AudioTranscoder(
         runTranscodeFlow()
         release()
 
-        listener.onFinish(outUri.toString())
+        audioConversionInfo.listener?.onFinish(audioConversionInfo.outputUri.toString())
     }
 
     private fun release() {
@@ -366,7 +371,7 @@ class AudioTranscoder(
 
     private fun onConversionFailed(message: String = "Failed to convert! Please try again!") {
         release()
-        listener.onFailed(message)
+        audioConversionInfo.listener?.onFailed(message)
     }
 
     private fun getOutputFormat(inputFormat: MediaFormat): MediaFormat {

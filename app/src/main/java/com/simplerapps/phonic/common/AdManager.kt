@@ -5,7 +5,6 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.R
 
 class AdManager {

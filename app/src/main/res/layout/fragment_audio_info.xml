@@ -48,7 +48,6 @@
         android:foreground="?android:attr/selectableItemBackgroundBorderless"
         android:text="Fade"
         android:textAllCaps="false"
-        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/bt_volume"
@@ -77,4 +76,16 @@
         app:layout_constraintBottom_toTopOf="@+id/bt_trim"
         app:layout_constraintEnd_toEndOf="@+id/bt_trim"
         app:layout_constraintStart_toStartOf="@+id/bt_trim" />
+
+    <TextView
+        android:id="@+id/tv_fade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="TextView"
+        android:textSize="12sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/bt_fade"
+        app:layout_constraintEnd_toEndOf="@+id/bt_fade"
+        app:layout_constraintStart_toStartOf="@+id/bt_fade" />
 </androidx.constraintlayout.widget.ConstraintLayout>

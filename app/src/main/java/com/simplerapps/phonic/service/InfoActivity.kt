@@ -10,6 +10,7 @@ import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.common.ProgressListener
 import com.simplerapps.phonic.databinding.ActivityInfoBinding
+import com.simplerapps.phonic.datamodel.AudioConversionInfo
 import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.share.ShareActivity
 import com.simplerapps.phonic.showInfoDialog
@@ -84,7 +85,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
         }
     }
 
-    override fun convertVideoToAudio(uri: String, trim: TrimRange?, volume: Int?) {
+    override fun convertVideoToAudio(audioConversionInfo: AudioConversionInfo) {
         convertProgressDialog.show(supportFragmentManager, null)
 
         thread(start = true) {
@@ -92,13 +93,12 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
                 File(applicationContext.cacheDir.absolutePath + FileInfoManager.cacheName)
             val outUri = Uri.fromFile(outFile)
 
+            audioConversionInfo.outputUri = outUri
+            audioConversionInfo.listener = this
+
             val audioConverter = AudioConverter(
                 this,
-                Uri.parse(uri),
-                outUri,
-                this,
-                trim,
-                volume
+                audioConversionInfo
             )
 
             audioConverter.convert()
@@ -106,7 +106,7 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
 
     }
 
-    override fun editAudio(uri: String, trim: TrimRange?, volume: Int?) {
+    override fun editAudio(audioConversionInfo: AudioConversionInfo) {
         convertProgressDialog.show(supportFragmentManager, null)
 
         thread(start = true) {
@@ -114,13 +114,12 @@ class InfoActivity : AppCompatActivity(), VideoToAudioFragment.Listener,
                 File(applicationContext.cacheDir.absolutePath + FileInfoManager.cacheName)
             val outUri = Uri.fromFile(outFile)
 
+            audioConversionInfo.outputUri = outUri
+            audioConversionInfo.listener = this
+
             val audioTranscoder = AudioConverter(
                 this,
-                Uri.parse(uri),
-                outUri,
-                this,
-                trim,
-                volume
+                audioConversionInfo
             )
 
             audioTranscoder.convert()

@@ -5,22 +5,17 @@ import android.media.MediaCodec
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
-import android.net.Uri
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import com.simplerapps.phonic.TrimRange
+import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.common.FileInfoManager
-import com.simplerapps.phonic.common.ProgressListener
+import com.simplerapps.phonic.datamodel.AudioConversionInfo
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 
 class AudioConverter(
     private val context: Context,
-    private val uri: Uri,
-    private val outputUri: Uri,
-    private val listener: ProgressListener,
-    private val trim: TrimRange?,
-    private val volume: Int? = null
+    private val audioConversionInfo: AudioConversionInfo
 ) {
 
     private var extractor: MediaExtractor = MediaExtractor()
@@ -33,20 +28,20 @@ class AudioConverter(
     private var durationUs = 0L
 
     init {
-        trim?.let {
+        audioConversionInfo.trim?.let { trim ->
             durationUs = (trim.to - trim.from) * 1000L
         }
     }
 
     fun convert() {
 
-        if (volume != null) {
+        if (audioConversionInfo.isTranscodeNeeded()) {
             startTranscoderFlow()
             return
         }
 
-        sourcePFD = context.contentResolver.openFileDescriptor(uri, "r")
-        desPFD = context.contentResolver.openFileDescriptor(outputUri, "w")
+        sourcePFD = context.contentResolver.openFileDescriptor(audioConversionInfo.uri, "r")
+        desPFD = context.contentResolver.openFileDescriptor(audioConversionInfo.outputUri, "w")
 
         if (sourcePFD == null || desPFD == null) {
             onConversionFailed()
@@ -78,7 +73,7 @@ class AudioConverter(
                 FileInfoManager.mimeType = mimeType
                 extractor.selectTrack(i)
                 trackNo = i
-                if (trim == null) {
+                if (audioConversionInfo.trim == null) {
                     durationUs = format.getLong(MediaFormat.KEY_DURATION)
                 }
                 break
@@ -93,7 +88,7 @@ class AudioConverter(
         muxer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             MediaMuxer(desFD, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
         } else {
-            val path = outputUri.path
+            val path = audioConversionInfo.outputUri.path
             if (path == null) {
                 onConversionFailed()
                 return
@@ -116,7 +111,7 @@ class AudioConverter(
 
         muxer.start()
 
-        trim?.let {
+        audioConversionInfo.trim?.let {
             while (extractor.sampleTime < it.from * 1000) {
                 extractor.advance()
             }
@@ -129,18 +124,18 @@ class AudioConverter(
                 break
             }
 
-            if (trim != null) {
-                if (extractor.sampleTime > trim.to * 1000) {
+            if (audioConversionInfo.trim != null) {
+                if (extractor.sampleTime > audioConversionInfo.trim!!.to * 1000) {
                     break
                 }
             }
 
-            bufferInfo.presentationTimeUs = if (trim == null) {
+            bufferInfo.presentationTimeUs = if (audioConversionInfo.trim == null) {
                 extractor.sampleTime
             } else {
-                extractor.sampleTime - trim.from * 1000
+                extractor.sampleTime - audioConversionInfo.trim!!.from * 1000
             }
-            listener.onProgress(
+            audioConversionInfo.listener?.onProgress(
                 ((bufferInfo.presentationTimeUs * 100) / durationUs).toInt()
             )
 
@@ -150,12 +145,12 @@ class AudioConverter(
         }
 
         release()
-        listener.onFinish(outputUri.toString())
+        audioConversionInfo.listener?.onFinish(audioConversionInfo.outputUri.toString())
     }
 
     private fun onConversionFailed(message: String = "Failed to convert! Please try again!") {
         release()
-        listener.onFailed(message)
+        audioConversionInfo.listener?.onFailed(message)
     }
 
     private fun release() {
@@ -183,11 +178,7 @@ class AudioConverter(
     private fun startTranscoderFlow() {
         val audioTranscoder = AudioTranscoder(
             context,
-            uri,
-            outputUri,
-            listener,
-            trim,
-            volume
+            audioConversionInfo
         )
         audioTranscoder.process()
     }

@@ -7,9 +7,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.TrimRange
+import com.simplerapps.phonic.bottomsheets.FadeBottomSheet
 import com.simplerapps.phonic.bottomsheets.TrimBottomSheet
 import com.simplerapps.phonic.bottomsheets.VolumeBottomSheet
 import com.simplerapps.phonic.common.FileInfoManager
@@ -17,11 +20,13 @@ import com.simplerapps.phonic.databinding.FragmentAudioInfoBinding
 import com.simplerapps.phonic.getFormattedTrimTimeText
 
 class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio_info),
-    TrimBottomSheet.TrimUpdateListener, VolumeBottomSheet.VolumeListener {
+    TrimBottomSheet.TrimUpdateListener, VolumeBottomSheet.VolumeListener, FadeBottomSheet.FadeListener {
 
     private lateinit var viewBinding: FragmentAudioInfoBinding
     private var trim: TrimRange? = null
     private var volume: Int? = null
+    private var fadeInMs = 0
+    private var fadeOutMs = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,10 +50,14 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
         viewBinding.btVolume.setOnClickListener {
             showVolumeBottomSheet()
         }
+
+        viewBinding.btFade.setOnClickListener {
+            showFadeBottomSheet()
+        }
     }
 
     private fun showTrimBottomSheet() {
-        getAudioDuration()?.let {
+        getAudioDurationUs()?.let {
             val trimBottomSheet = TrimBottomSheet(it, trim, this)
             trimBottomSheet.show(childFragmentManager, null)
         }
@@ -59,7 +68,12 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
         volumeBottomSheet.show(childFragmentManager, null)
     }
 
-    private fun getAudioDuration(): Long? {
+    private fun showFadeBottomSheet() {
+        val fadeBottomSheet = FadeBottomSheet(fadeInMs, fadeOutMs, listener = this)
+        fadeBottomSheet.show(childFragmentManager, null)
+    }
+
+    private fun getAudioDurationUs(): Long? {
         var duration: Long? = null
 
         val extractor = MediaExtractor()
@@ -95,5 +109,25 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
             viewBinding.tvTrimChoosenVolume.text = "$it%"
             FileInfoManager.volume = it
         }
+    }
+
+    override fun onFadeChanged(fadeInMs: Int, fadeOutMs: Int) {
+        getAudioDurationUs()?.let { duration ->
+            if (duration / 1000 < fadeInMs + fadeOutMs) {
+                Toast.makeText(context,"Duration is less than fade",Toast.LENGTH_LONG).show()
+            }
+            else {
+                this.fadeInMs = fadeInMs
+                this.fadeOutMs = fadeOutMs
+                FileInfoManager.fadeInMs = this.fadeInMs
+                FileInfoManager.fadeOutMs = this.fadeOutMs
+                viewBinding.tvFade.visibility = View.VISIBLE
+                viewBinding.tvFade.text = "${getFormattedFadeTime(fadeInMs)}  ${getFormattedFadeTime(fadeOutMs)}"
+            }
+        }
+    }
+
+    private fun getFormattedFadeTime(timeMs: Int) : String {
+        return "${String.format("%.1f",timeMs / 1000f)}s"
     }
 }

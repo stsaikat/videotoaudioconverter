@@ -15,9 +15,9 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.simplerapps.phonic.R
-import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.FragmentVideoToAudioInfoBinding
+import com.simplerapps.phonic.datamodel.AudioConversionInfo
 import com.simplerapps.phonic.fragment.AudioInfoFragment
 
 class VideoToAudioFragment(private val uri: String, private val listener: Listener) :
@@ -40,7 +40,15 @@ class VideoToAudioFragment(private val uri: String, private val listener: Listen
 
         viewBinding.btConvert.setOnClickListener {
             exoplayer.pause()
-            listener.convertVideoToAudio(uri, FileInfoManager.trim, FileInfoManager.volume)
+            listener.convertVideoToAudio(
+                AudioConversionInfo(
+                    uri = Uri.parse(uri),
+                    trim = FileInfoManager.trim,
+                    volume = FileInfoManager.volume,
+                    fadeInMs = FileInfoManager.fadeInMs,
+                    fadeOutMs = FileInfoManager.fadeOutMs
+                )
+            )
         }
     }
 
@@ -106,6 +114,6 @@ class VideoToAudioFragment(private val uri: String, private val listener: Listen
     }
 
     interface Listener {
-        fun convertVideoToAudio(uri: String, trim: TrimRange?, volume: Int?)
+        fun convertVideoToAudio(audioConversionInfo: AudioConversionInfo)
     }
 }
