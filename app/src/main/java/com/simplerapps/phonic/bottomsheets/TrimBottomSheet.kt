@@ -41,6 +41,7 @@ class TrimBottomSheet(
         super.onStart()
         initValues()
         initButtonListeners()
+        isCancelable = false
     }
 
     private fun initValues() {
