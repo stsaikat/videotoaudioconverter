@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.bottomsheets.FadeBottomSheet
@@ -20,13 +19,16 @@ import com.simplerapps.phonic.databinding.FragmentAudioInfoBinding
 import com.simplerapps.phonic.getFormattedTrimTimeText
 
 class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio_info),
-    TrimBottomSheet.TrimUpdateListener, VolumeBottomSheet.VolumeListener, FadeBottomSheet.FadeListener {
+    TrimBottomSheet.TrimUpdateListener, VolumeBottomSheet.VolumeListener,
+    FadeBottomSheet.FadeListener {
 
     private lateinit var viewBinding: FragmentAudioInfoBinding
     private var trim: TrimRange? = null
     private var volume: Int? = null
     private var fadeInMs = 0
     private var fadeOutMs = 0
+
+    private var audioDurationUs: Long? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,6 +76,10 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
     }
 
     private fun getAudioDurationUs(): Long? {
+        if (audioDurationUs != null) {
+            return audioDurationUs
+        }
+
         var duration: Long? = null
 
         val extractor = MediaExtractor()
@@ -97,7 +103,7 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
             this.trim = it
             viewBinding.tvTrimChoosenDuration.visibility = View.VISIBLE
             viewBinding.tvTrimChoosenDuration.text =
-                getFormattedTrimTimeText(it.to - it.from)
+                getFormattedTrimTimeText(it.toMs - it.fromMs)
             FileInfoManager.trim = it
         }
     }
@@ -106,28 +112,44 @@ class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio
         volume?.let {
             this.volume = it
             viewBinding.tvTrimChoosenVolume.visibility = View.VISIBLE
-            viewBinding.tvTrimChoosenVolume.text = "$it%"
+            "$it%".also { viewBinding.tvTrimChoosenVolume.text = it }
             FileInfoManager.volume = it
         }
     }
 
     override fun onFadeChanged(fadeInMs: Int, fadeOutMs: Int) {
-        getAudioDurationUs()?.let { duration ->
-            if (duration / 1000 < fadeInMs + fadeOutMs) {
-                Toast.makeText(context,"Duration is less than fade",Toast.LENGTH_LONG).show()
-            }
-            else {
-                this.fadeInMs = fadeInMs
-                this.fadeOutMs = fadeOutMs
-                FileInfoManager.fadeInMs = this.fadeInMs
-                FileInfoManager.fadeOutMs = this.fadeOutMs
-                viewBinding.tvFade.visibility = View.VISIBLE
-                viewBinding.tvFade.text = "${getFormattedFadeTime(fadeInMs)}  ${getFormattedFadeTime(fadeOutMs)}"
-            }
+        if (!isFadePossible(fadeInMs, fadeOutMs)) {
+            Toast.makeText(context, "Duration is less than fade", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        this.fadeInMs = fadeInMs
+        this.fadeOutMs = fadeOutMs
+        FileInfoManager.fadeInMs = this.fadeInMs
+        FileInfoManager.fadeOutMs = this.fadeOutMs
+        viewBinding.tvFade.visibility = View.VISIBLE
+        "${getFormattedFadeTime(fadeInMs)}  ${getFormattedFadeTime(fadeOutMs)}".also {
+            viewBinding.tvFade.text = it
         }
     }
 
-    private fun getFormattedFadeTime(timeMs: Int) : String {
-        return "${String.format("%.1f",timeMs / 1000f)}s"
+    private fun isFadePossible(fadeInMs: Int, fadeOutMs: Int): Boolean {
+        trim?.let {
+            if (it.toMs - it.fromMs < fadeInMs + fadeOutMs) {
+                return false
+            }
+        }
+
+        getAudioDurationUs()?.let {
+            if (it / 1000 < fadeInMs + fadeOutMs) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    private fun getFormattedFadeTime(timeMs: Int): String {
+        return "${String.format("%.1f", timeMs / 1000f)}s"
     }
 }

@@ -52,8 +52,8 @@ class TrimBottomSheet(
     }
 
     private fun inflateCurrentTrim(trim: TrimRange) {
-        viewBinding.rsbTrim.setMinThumbValue(trim.from)
-        viewBinding.rsbTrim.setMaxThumbValue(trim.to)
+        viewBinding.rsbTrim.setMinThumbValue(trim.fromMs)
+        viewBinding.rsbTrim.setMaxThumbValue(trim.toMs)
     }
 
     private fun initButtonListeners() {

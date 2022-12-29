@@ -41,7 +41,7 @@ class AudioTranscoder(
 
     init {
         audioConversionInfo.trim?.let { trim ->
-            durationUs = (trim.to - trim.from) * 1000L
+            durationUs = (trim.toMs - trim.fromMs) * 1000L
         }
     }
 
@@ -142,7 +142,7 @@ class AudioTranscoder(
 
 
         audioConversionInfo.trim?.let {
-            while (extractor.sampleTime < it.from * 1000) {
+            while (extractor.sampleTime < it.fromMs * 1000) {
                 extractor.advance()
             }
         }
@@ -156,7 +156,7 @@ class AudioTranscoder(
                 val sampleSize = extractor.readSampleData(buffer, 0)
 
                 val endFlag = if (audioConversionInfo.trim != null) {
-                    extractor.sampleTime > audioConversionInfo.trim!!.to * 1000
+                    extractor.sampleTime > audioConversionInfo.trim!!.toMs * 1000
                 } else {
                     false
                 }
@@ -167,7 +167,7 @@ class AudioTranscoder(
                         if (audioConversionInfo.trim == null) {
                             extractor.sampleTime
                         } else {
-                            extractor.sampleTime - audioConversionInfo.trim!!.from * 1000
+                            extractor.sampleTime - audioConversionInfo.trim!!.fromMs * 1000
                         },
                         extractor.sampleFlags
                     )

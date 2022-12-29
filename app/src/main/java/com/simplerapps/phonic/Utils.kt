@@ -54,7 +54,7 @@ fun showInfoDialog(
     processResultDialog.show(supportFragmentManager, null)
 }
 
-data class TrimRange(var from: Int, var to: Int)
+data class TrimRange(var fromMs: Int, var toMs: Int)
 
 fun getFormattedTrimTimeText(time: Int): String {
     val ss = (time % 1000) / 100
