@@ -13,7 +13,6 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.databinding.FragmentMyFolderBinding
-import com.simplerapps.phonic.dialog.MyFolderOptionsDialog
 import com.simplerapps.phonic.processChosenAudioUri
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
@@ -21,8 +20,8 @@ import com.simplerapps.phonic.shareAudioFile
 import kotlinx.coroutines.launch
 
 class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
-    MyFolderRecyclerViewAdapter.OnItemClickListener, Player.Listener,
-    MyFolderOptionsDialog.OnMyFolderOptionsClick {
+    MyFolderRecyclerViewAdapter.OnItemClickListener, Player.Listener
+    /*MyFolderOptionsDialog.OnMyFolderOptionsClick*/ {
 
     private lateinit var myFolderRepo: MyFolderRepo
     private lateinit var exoplayer: ExoPlayer
@@ -84,10 +83,10 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         viewBinding.pbRvLoading.visibility = View.GONE
     }
 
-    override fun onItemMoreClick(audioFileModel: AudioFileModel) {
+/*    override fun onItemMoreClick(audioFileModel: AudioFileModel) {
         val dialog = MyFolderOptionsDialog(audioFileModel, this)
         dialog.show(childFragmentManager, null)
-    }
+    }*/
 
     override fun onItemClick(audioFileModel: AudioFileModel) {
         exoplayer.stop()

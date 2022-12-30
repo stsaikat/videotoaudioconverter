@@ -25,12 +25,12 @@
             android:text="name will go here.m4a"
             android:textColor="@color/text_color_active"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/ib_share_audio_item"
+            app:layout_constraintEnd_toStartOf="@+id/ib_more"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
-            android:id="@+id/ib_share_audio_item"
+            android:id="@+id/ib_more"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@android:color/transparent"
