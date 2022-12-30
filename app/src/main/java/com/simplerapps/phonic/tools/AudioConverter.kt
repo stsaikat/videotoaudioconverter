@@ -7,7 +7,6 @@ import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.datamodel.AudioConversionInfo
 import java.io.FileDescriptor
@@ -29,7 +28,7 @@ class AudioConverter(
 
     init {
         audioConversionInfo.trim?.let { trim ->
-            durationUs = (trim.to - trim.from) * 1000L
+            durationUs = (trim.toMs - trim.fromMs) * 1000L
         }
     }
 
@@ -112,7 +111,7 @@ class AudioConverter(
         muxer.start()
 
         audioConversionInfo.trim?.let {
-            while (extractor.sampleTime < it.from * 1000) {
+            while (extractor.sampleTime < it.fromMs * 1000) {
                 extractor.advance()
             }
         }
@@ -125,7 +124,7 @@ class AudioConverter(
             }
 
             if (audioConversionInfo.trim != null) {
-                if (extractor.sampleTime > audioConversionInfo.trim!!.to * 1000) {
+                if (extractor.sampleTime > audioConversionInfo.trim!!.toMs * 1000) {
                     break
                 }
             }
@@ -133,7 +132,7 @@ class AudioConverter(
             bufferInfo.presentationTimeUs = if (audioConversionInfo.trim == null) {
                 extractor.sampleTime
             } else {
-                extractor.sampleTime - audioConversionInfo.trim!!.from * 1000
+                extractor.sampleTime - audioConversionInfo.trim!!.fromMs * 1000
             }
             audioConversionInfo.listener?.onProgress(
                 ((bufferInfo.presentationTimeUs * 100) / durationUs).toInt()

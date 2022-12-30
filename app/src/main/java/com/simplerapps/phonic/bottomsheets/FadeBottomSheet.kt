@@ -43,6 +43,11 @@ class FadeBottomSheet(
         viewBinding.sbFadeOut.progress = fadeOutMs
     }
 
+    override fun onStart() {
+        super.onStart()
+        isCancelable = false
+    }
+
     private fun getFormattedFadeTime(timeMs: Int) : String {
         return "${String.format("%.1f",timeMs / 1000f)}s"
     }

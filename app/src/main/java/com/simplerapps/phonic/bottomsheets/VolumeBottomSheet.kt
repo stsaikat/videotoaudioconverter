@@ -9,7 +9,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.simplerapps.phonic.databinding.BottomSheetVolumeBinding
 import com.simplerapps.phonic.view.VolumeProgressBarView
 
-class VolumeBottomSheet(val initialVolume: Int? = null, val listener: VolumeListener) :
+class VolumeBottomSheet(private val initialVolume: Int? = null, val listener: VolumeListener) :
     BottomSheetDialogFragment(), VolumeProgressBarView.OnVolumeChangedListener {
 
     private lateinit var viewBinding: BottomSheetVolumeBinding
@@ -56,6 +56,6 @@ class VolumeBottomSheet(val initialVolume: Int? = null, val listener: VolumeList
 
     override fun onVolumeChange(volume: Int) {
         this.volume = volume
-        viewBinding.tvChoosenVolume.text = "$volume%"
+        "$volume%".also { viewBinding.tvChoosenVolume.text = it }
     }
 }
