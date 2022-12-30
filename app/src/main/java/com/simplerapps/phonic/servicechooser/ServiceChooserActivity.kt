@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityServiceChooserBinding
+import com.simplerapps.phonic.getMp4RemovedName
+import com.simplerapps.phonic.goToInfoActivity
+import com.simplerapps.phonic.processChosenAudioUri
 import com.simplerapps.phonic.service.InfoActivity
 import com.simplerapps.phonic.service.InfoActivity.Companion.SERVICE_ID
 
@@ -124,30 +127,5 @@ class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickLis
         }
 
         goToInfoActivity(Service.VIDEO_TO_AUDIO)
-    }
-
-    private fun processChosenAudioUri(uri: Uri) {
-        FileInfoManager.fileUri = uri
-        contentResolver.query(uri, null, null, null, null)?.use {
-            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
-
-            it.moveToFirst()
-
-            FileInfoManager.fileName = getMp4RemovedName(it.getString(nameIndex))
-            FileInfoManager.fileSize = it.getLong(sizeIndex)
-        }
-
-        goToInfoActivity(Service.EDIT_AUDIO)
-    }
-
-    private fun getMp4RemovedName(name: String) : String {
-        return name.removeSuffix(".mp4").removeSuffix(".m4a").removeSuffix(".mp3")
-    }
-
-    private fun goToInfoActivity(withService: Service) {
-        val intent = Intent(this, InfoActivity::class.java)
-        intent.putExtra(SERVICE_ID, withService.serviceId)
-        startActivity(intent)
     }
 }

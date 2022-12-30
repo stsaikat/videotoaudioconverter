@@ -6,11 +6,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
-import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.common.ProgressListener
 import com.simplerapps.phonic.databinding.ActivityInfoBinding
 import com.simplerapps.phonic.datamodel.AudioConversionInfo
+import com.simplerapps.phonic.dialog.ConvertProgressDialog
 import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.share.ShareActivity
 import com.simplerapps.phonic.showInfoDialog

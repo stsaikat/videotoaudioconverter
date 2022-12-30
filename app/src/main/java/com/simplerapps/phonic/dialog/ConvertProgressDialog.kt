@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.service
+package com.simplerapps.phonic.dialog
 
 import android.app.AlertDialog
 import android.app.Dialog

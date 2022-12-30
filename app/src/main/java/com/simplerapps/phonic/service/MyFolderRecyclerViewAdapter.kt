@@ -41,7 +41,7 @@ class MyFolderRecyclerViewAdapter(
         )
 
         holder.shareButton.setOnClickListener {
-            listener.onItemShareClick(audioFileModel)
+            listener.onItemMoreClick(audioFileModel)
         }
         holder.nameTextView.setOnClickListener {
             listener.onItemClick(audioFileModel)
@@ -56,7 +56,7 @@ class MyFolderRecyclerViewAdapter(
     override fun getItemCount(): Int = list.size
 
     interface OnItemClickListener {
-        fun onItemShareClick(audioFileModel: AudioFileModel)
+        fun onItemMoreClick(audioFileModel: AudioFileModel)
         fun onItemClick(audioFileModel: AudioFileModel)
     }
 }

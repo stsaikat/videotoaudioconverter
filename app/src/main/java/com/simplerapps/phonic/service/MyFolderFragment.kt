@@ -5,32 +5,30 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
-import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.ui.PlayerControlView
-import com.google.android.exoplayer2.ui.PlayerView
 import com.simplerapps.phonic.R
 import com.simplerapps.phonic.databinding.FragmentMyFolderBinding
+import com.simplerapps.phonic.dialog.MyFolderOptionsDialog
+import com.simplerapps.phonic.processChosenAudioUri
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
 import com.simplerapps.phonic.shareAudioFile
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
-    MyFolderRecyclerViewAdapter.OnItemClickListener, Player.Listener {
+    MyFolderRecyclerViewAdapter.OnItemClickListener, Player.Listener,
+    MyFolderOptionsDialog.OnMyFolderOptionsClick {
 
     private lateinit var myFolderRepo: MyFolderRepo
     private lateinit var exoplayer: ExoPlayer
 
     private lateinit var viewBinding: FragmentMyFolderBinding
+    private val list = ArrayList<AudioFileModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,7 +68,7 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
     }
 
     private fun initRecyclerView() {
-        val list = ArrayList<AudioFileModel>()
+        list.clear()
         myFolderRepo.getMyAudioList()?.let {
             list.addAll(it)
         }
@@ -86,11 +84,9 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         viewBinding.pbRvLoading.visibility = View.GONE
     }
 
-    override fun onItemShareClick(audioFileModel: AudioFileModel) {
-        requireActivity().shareAudioFile(
-            uri = Uri.parse(audioFileModel.uri),
-            name = audioFileModel.displayName
-        )
+    override fun onItemMoreClick(audioFileModel: AudioFileModel) {
+        val dialog = MyFolderOptionsDialog(audioFileModel, this)
+        dialog.show(childFragmentManager, null)
     }
 
     override fun onItemClick(audioFileModel: AudioFileModel) {
@@ -102,5 +98,16 @@ class MyFolderFragment : Fragment(R.layout.fragment_my_folder),
         exoplayer.play()
 
         //viewBinding.myFolderPlayer.visibility = View.VISIBLE
+    }
+
+    override fun onEditClick(audioFileModel: AudioFileModel) {
+        activity?.processChosenAudioUri(Uri.parse(audioFileModel.uri))
+    }
+
+    override fun onShareClick(audioFileModel: AudioFileModel) {
+        requireActivity().shareAudioFile(
+            uri = Uri.parse(audioFileModel.uri),
+            name = audioFileModel.displayName
+        )
     }
 }

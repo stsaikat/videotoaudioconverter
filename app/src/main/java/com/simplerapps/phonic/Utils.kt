@@ -3,8 +3,12 @@ package com.simplerapps.phonic
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.util.Log
 import androidx.fragment.app.FragmentManager
+import com.simplerapps.phonic.common.FileInfoManager
+import com.simplerapps.phonic.service.InfoActivity
+import com.simplerapps.phonic.servicechooser.Service
 import com.simplerapps.phonic.share.ProcessResultDialog
 import java.text.SimpleDateFormat
 import java.util.*
@@ -63,4 +67,29 @@ fun getFormattedTrimTimeText(time: Int): String {
     val m = (seconds / 60) % 60
     val h = (seconds / (60 * 60)) % 24
     return String.format("%02d:%02d:%02d.%01d", h, m, s, ss)
+}
+
+fun Activity.goToInfoActivity(withService: Service) {
+    val intent = Intent(this, InfoActivity::class.java)
+    intent.putExtra(InfoActivity.SERVICE_ID, withService.serviceId)
+    startActivity(intent)
+}
+
+fun Activity.processChosenAudioUri(uri: Uri) {
+    FileInfoManager.fileUri = uri
+    contentResolver.query(uri, null, null, null, null)?.use {
+        val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+
+        it.moveToFirst()
+
+        FileInfoManager.fileName = getMp4RemovedName(it.getString(nameIndex))
+        FileInfoManager.fileSize = it.getLong(sizeIndex)
+    }
+
+    goToInfoActivity(Service.EDIT_AUDIO)
+}
+
+fun getMp4RemovedName(name: String) : String {
+    return name.removeSuffix(".mp4").removeSuffix(".m4a").removeSuffix(".mp3")
 }
