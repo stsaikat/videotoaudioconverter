@@ -1,4 +1,4 @@
-package com.simplerapps.phonic
+package com.simplerapps.phonic.fragment
 
 import android.content.Context
 import android.media.MediaMetadataRetriever
@@ -12,8 +12,11 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.simplerapps.phonic.R
 
-class ConvertInfoFragment(private val uri: Uri,private val onClickListener: OnClickListener) : Fragment(R.layout.fragment_convert_info) {
+class ConvertInfoFragment(private val uri: Uri,private val onClickListener: OnClickListener) : Fragment(
+    R.layout.fragment_convert_info
+) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

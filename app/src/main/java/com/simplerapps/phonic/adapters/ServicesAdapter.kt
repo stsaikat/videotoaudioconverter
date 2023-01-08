@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.servicechooser
+package com.simplerapps.phonic.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,8 +7,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.simplerapps.phonic.R
+import com.simplerapps.phonic.datamodel.Service
 
-class ServicesAdapter(private val list: ArrayList<Service>,private val listener: ItemClickListener) :
+class ServicesAdapter(private val list: ArrayList<Service>, private val listener: ItemClickListener) :
     RecyclerView.Adapter<ServicesAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

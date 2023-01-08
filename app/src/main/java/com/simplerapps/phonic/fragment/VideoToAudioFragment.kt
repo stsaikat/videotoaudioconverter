@@ -1,5 +1,7 @@
-package com.simplerapps.phonic.service
+package com.simplerapps.phonic.fragment
 
+import android.media.MediaExtractor
+import android.media.MediaFormat
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,33 +15,31 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.simplerapps.phonic.R
-import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.FileInfoManager
-import com.simplerapps.phonic.databinding.FragmentEditAudioBinding
+import com.simplerapps.phonic.databinding.FragmentVideoToAudioInfoBinding
 import com.simplerapps.phonic.datamodel.AudioConversionInfo
-import com.simplerapps.phonic.fragment.AudioInfoFragment
 
-class EditAudioFragment(private val uri: String, private val listener: Listener) :
-    Fragment(R.layout.fragment_edit_audio), Player.Listener {
+class VideoToAudioFragment(private val uri: String, private val listener: Listener) :
+    Fragment(R.layout.fragment_video_to_audio_info), Player.Listener {
 
     private lateinit var exoplayer: ExoPlayer
-    private lateinit var viewBinding: FragmentEditAudioBinding
+    private lateinit var viewBinding: FragmentVideoToAudioInfoBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewBinding = FragmentEditAudioBinding.inflate(inflater, container, false)
+        viewBinding = FragmentVideoToAudioInfoBinding.inflate(inflater, container, false)
         return viewBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewBinding.btProcess.setOnClickListener {
+        viewBinding.btConvert.setOnClickListener {
             exoplayer.pause()
-            listener.editAudio(
+            listener.convertVideoToAudio(
                 AudioConversionInfo(
                     uri = Uri.parse(uri),
                     trim = FileInfoManager.trim,
@@ -49,9 +49,6 @@ class EditAudioFragment(private val uri: String, private val listener: Listener)
                 )
             )
         }
-
-        viewBinding.exoVideoPlayer.controllerShowTimeoutMs = 0
-        viewBinding.exoVideoPlayer.controllerHideOnTouch = false
     }
 
     override fun onStart() {
@@ -68,8 +65,27 @@ class EditAudioFragment(private val uri: String, private val listener: Listener)
     private fun showFragment(fragment: Fragment) {
         childFragmentManager.commit {
             setReorderingAllowed(true)
-            replace(viewBinding.fragmentAudioInfo.id, fragment)
+            replace(viewBinding.fragmentContainerAudioInfo.id, fragment)
         }
+    }
+
+    private fun getAudioDuration(): Long? {
+        var duration: Long? = null
+
+        val extractor = MediaExtractor()
+        val pfd = requireContext().contentResolver.openFileDescriptor(Uri.parse(uri), "r")!!
+        extractor.setDataSource(pfd.fileDescriptor)
+        for (i in 0 until extractor.trackCount) {
+            val format = extractor.getTrackFormat(i)
+            val mime = format.getString(MediaFormat.KEY_MIME)!!
+            if (mime.startsWith("audio/")) {
+                duration = format.getLong(MediaFormat.KEY_DURATION)
+            }
+        }
+
+        pfd.close()
+        extractor.release()
+        return duration
     }
 
     override fun onStop() {
@@ -97,6 +113,6 @@ class EditAudioFragment(private val uri: String, private val listener: Listener)
     }
 
     interface Listener {
-        fun editAudio(audioConversionInfo: AudioConversionInfo)
+        fun convertVideoToAudio(audioConversionInfo: AudioConversionInfo)
     }
 }

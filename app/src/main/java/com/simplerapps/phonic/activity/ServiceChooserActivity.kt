@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.servicechooser
+package com.simplerapps.phonic.activity
 
 import android.content.Intent
 import android.net.Uri
@@ -13,8 +13,8 @@ import com.simplerapps.phonic.databinding.ActivityServiceChooserBinding
 import com.simplerapps.phonic.getMp4RemovedName
 import com.simplerapps.phonic.goToInfoActivity
 import com.simplerapps.phonic.processChosenAudioUri
-import com.simplerapps.phonic.service.InfoActivity
-import com.simplerapps.phonic.service.InfoActivity.Companion.SERVICE_ID
+import com.simplerapps.phonic.datamodel.Service
+import com.simplerapps.phonic.adapters.ServicesAdapter
 
 class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickListener {
     companion object {

@@ -1,4 +1,4 @@
-package com.simplerapps.phonic
+package com.simplerapps.phonic.fragment
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.provider.MediaStore
 import android.view.View
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import com.simplerapps.phonic.R
 
 class SelectVideoFragment : Fragment(R.layout.fragment_select_video) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

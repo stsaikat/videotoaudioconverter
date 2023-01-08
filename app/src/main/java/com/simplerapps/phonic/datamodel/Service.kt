@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.servicechooser
+package com.simplerapps.phonic.datamodel
 
 enum class Service(
     val serviceName: String,

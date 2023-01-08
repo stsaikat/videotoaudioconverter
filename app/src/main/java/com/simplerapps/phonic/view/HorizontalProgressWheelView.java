@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.tools;
+package com.simplerapps.phonic.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;

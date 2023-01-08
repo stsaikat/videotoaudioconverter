@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.splash
+package com.simplerapps.phonic.activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,7 +8,6 @@ import android.os.Looper
 import com.google.android.gms.ads.MobileAds
 import com.simplerapps.phonic.common.AdManager
 import com.simplerapps.phonic.databinding.ActivitySplashBinding
-import com.simplerapps.phonic.servicechooser.ServiceChooserActivity
 
 class SplashActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivitySplashBinding
@@ -24,7 +23,7 @@ class SplashActivity : AppCompatActivity() {
         AdManager.loadAd(applicationContext)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this,ServiceChooserActivity::class.java)
+            val intent = Intent(this, ServiceChooserActivity::class.java)
             startActivity(intent)
             finish()
         },2500)

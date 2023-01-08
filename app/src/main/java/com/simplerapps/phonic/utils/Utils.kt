@@ -1,4 +1,4 @@
-package com.simplerapps.phonic
+package com.simplerapps.phonic.utils
 
 import android.app.Activity
 import android.content.Intent
@@ -7,9 +7,9 @@ import android.provider.OpenableColumns
 import android.util.Log
 import androidx.fragment.app.FragmentManager
 import com.simplerapps.phonic.common.FileInfoManager
-import com.simplerapps.phonic.service.InfoActivity
-import com.simplerapps.phonic.servicechooser.Service
-import com.simplerapps.phonic.share.ProcessResultDialog
+import com.simplerapps.phonic.activity.InfoActivity
+import com.simplerapps.phonic.datamodel.Service
+import com.simplerapps.phonic.dialog.ProcessResultDialog
 import java.text.SimpleDateFormat
 import java.util.*
 

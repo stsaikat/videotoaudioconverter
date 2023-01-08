@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.service
+package com.simplerapps.phonic.activity
 
 import android.content.Intent
 import android.net.Uri
@@ -11,8 +11,10 @@ import com.simplerapps.phonic.common.ProgressListener
 import com.simplerapps.phonic.databinding.ActivityInfoBinding
 import com.simplerapps.phonic.datamodel.AudioConversionInfo
 import com.simplerapps.phonic.dialog.ConvertProgressDialog
-import com.simplerapps.phonic.servicechooser.Service
-import com.simplerapps.phonic.share.ShareActivity
+import com.simplerapps.phonic.fragment.EditAudioFragment
+import com.simplerapps.phonic.fragment.MyFolderFragment
+import com.simplerapps.phonic.fragment.VideoToAudioFragment
+import com.simplerapps.phonic.datamodel.Service
 import com.simplerapps.phonic.showInfoDialog
 import com.simplerapps.phonic.tools.AudioConverter
 import java.io.File

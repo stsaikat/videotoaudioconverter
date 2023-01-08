@@ -24,7 +24,7 @@
             android:value="@string/admob_app_id" />
 
         <activity
-            android:name="com.simplerapps.phonic.share.ShareActivity"
+            android:name="com.simplerapps.phonic.activity.ShareActivity"
             android:exported="false"
             android:screenOrientation="portrait">
             <meta-data
@@ -32,7 +32,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name="com.simplerapps.phonic.service.InfoActivity"
+            android:name="com.simplerapps.phonic.activity.InfoActivity"
             android:exported="false"
             android:screenOrientation="portrait">
             <meta-data
@@ -40,7 +40,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name="com.simplerapps.phonic.servicechooser.ServiceChooserActivity"
+            android:name="com.simplerapps.phonic.activity.ServiceChooserActivity"
             android:exported="false"
             android:screenOrientation="portrait">
             <meta-data
@@ -48,7 +48,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name="com.simplerapps.phonic.splash.SplashActivity"
+            android:name="com.simplerapps.phonic.activity.SplashActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -58,7 +58,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.simplerapps.phonic.MainActivity"
+            android:name="com.simplerapps.phonic.activity.MainActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
     </application>

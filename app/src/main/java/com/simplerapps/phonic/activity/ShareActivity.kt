@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.share
+package com.simplerapps.phonic.activity
 
 import android.Manifest
 import android.content.ContentValues
@@ -16,23 +16,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.OnUserEarnedRewardListener
-import com.google.android.gms.ads.rewarded.RewardedAd
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd
-import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback
 import com.simplerapps.phonic.*
 import com.simplerapps.phonic.common.AdManager
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityShareBinding
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
-import com.simplerapps.phonic.service.InfoActivity
-import com.simplerapps.phonic.service.InfoActivity.Companion.CONTENT_URI
-import com.simplerapps.phonic.servicechooser.Service
-import com.simplerapps.phonic.servicechooser.ServiceChooserActivity
+import com.simplerapps.phonic.activity.InfoActivity.Companion.CONTENT_URI
+import com.simplerapps.phonic.datamodel.Service
 import java.io.File
 
 class ShareActivity : AppCompatActivity() {

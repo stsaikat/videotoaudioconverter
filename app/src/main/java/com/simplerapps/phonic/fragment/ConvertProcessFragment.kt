@@ -1,4 +1,4 @@
-package com.simplerapps.phonic
+package com.simplerapps.phonic.fragment
 
 import android.media.MediaPlayer
 import android.net.Uri
@@ -10,6 +10,8 @@ import android.widget.SeekBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.simplerapps.phonic.R
+import com.simplerapps.phonic.convertSecondsToHMmSs
 import com.simplerapps.phonic.databinding.FragmentConvertProcessBinding
 import kotlinx.coroutines.*
 

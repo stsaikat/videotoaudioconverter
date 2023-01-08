@@ -1,4 +1,4 @@
-package com.simplerapps.phonic.service
+package com.simplerapps.phonic.adapters
 
 import android.view.LayoutInflater
 import android.view.View
