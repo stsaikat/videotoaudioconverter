@@ -66,6 +66,7 @@
         android:padding="8dp"
         android:text="Done"
         android:textColor="@color/color_active"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -81,6 +82,7 @@
         android:padding="8dp"
         android:text="Cancel"
         android:textColor="@color/text_color_active"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
