@@ -12,12 +12,12 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.simplerapps.phonic.R
+import com.simplerapps.phonic.adapters.MyFolderRecyclerViewAdapter
 import com.simplerapps.phonic.databinding.FragmentMyFolderBinding
-import com.simplerapps.phonic.processChosenAudioUri
 import com.simplerapps.phonic.repository.AudioFileModel
 import com.simplerapps.phonic.repository.MyFolderRepo
-import com.simplerapps.phonic.adapters.MyFolderRecyclerViewAdapter
-import com.simplerapps.phonic.shareAudioFile
+import com.simplerapps.phonic.utils.processChosenAudioUri
+import com.simplerapps.phonic.utils.shareAudioFile
 import kotlinx.coroutines.launch
 
 class MyFolderFragment : Fragment(R.layout.fragment_my_folder),

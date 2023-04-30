@@ -15,8 +15,8 @@ import com.simplerapps.phonic.fragment.EditAudioFragment
 import com.simplerapps.phonic.fragment.MyFolderFragment
 import com.simplerapps.phonic.fragment.VideoToAudioFragment
 import com.simplerapps.phonic.datamodel.Service
-import com.simplerapps.phonic.showInfoDialog
 import com.simplerapps.phonic.tools.AudioConverter
+import com.simplerapps.phonic.utils.showInfoDialog
 import java.io.File
 import kotlin.concurrent.thread
 

@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.gms.ads.AdRequest
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.ActivityServiceChooserBinding
-import com.simplerapps.phonic.getMp4RemovedName
-import com.simplerapps.phonic.goToInfoActivity
-import com.simplerapps.phonic.processChosenAudioUri
 import com.simplerapps.phonic.datamodel.Service
 import com.simplerapps.phonic.adapters.ServicesAdapter
+import com.simplerapps.phonic.utils.getMp4RemovedName
+import com.simplerapps.phonic.utils.goToInfoActivity
+import com.simplerapps.phonic.utils.processChosenAudioUri
 
 class ServiceChooserActivity : AppCompatActivity(), ServicesAdapter.ItemClickListener {
     companion object {

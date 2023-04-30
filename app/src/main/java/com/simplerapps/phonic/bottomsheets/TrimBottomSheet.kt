@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.innovattic.rangeseekbar.RangeSeekBar
-import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.databinding.BottomSheetTrimBinding
-import com.simplerapps.phonic.getFormattedTrimTimeText
+import com.simplerapps.phonic.utils.TrimRange
+import com.simplerapps.phonic.utils.getFormattedTrimTimeText
 import kotlin.math.max
 
 class TrimBottomSheet(

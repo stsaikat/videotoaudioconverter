@@ -10,13 +10,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.simplerapps.phonic.R
-import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.bottomsheets.FadeBottomSheet
 import com.simplerapps.phonic.bottomsheets.TrimBottomSheet
 import com.simplerapps.phonic.bottomsheets.VolumeBottomSheet
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.databinding.FragmentAudioInfoBinding
-import com.simplerapps.phonic.getFormattedTrimTimeText
+import com.simplerapps.phonic.utils.TrimRange
+import com.simplerapps.phonic.utils.getFormattedTrimTimeText
 
 class AudioInfoFragment(private val uri: Uri) : Fragment(R.layout.fragment_audio_info),
     TrimBottomSheet.TrimUpdateListener, VolumeBottomSheet.VolumeListener,

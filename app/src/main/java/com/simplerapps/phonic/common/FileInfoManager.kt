@@ -1,7 +1,7 @@
 package com.simplerapps.phonic.common
 
 import android.net.Uri
-import com.simplerapps.phonic.TrimRange
+import com.simplerapps.phonic.utils.TrimRange
 
 class FileInfoManager {
     companion object {

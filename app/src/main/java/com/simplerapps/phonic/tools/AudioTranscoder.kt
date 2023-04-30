@@ -4,9 +4,9 @@ import android.content.Context
 import android.media.*
 import android.os.Build
 import android.os.ParcelFileDescriptor
-import com.simplerapps.phonic.LogD
 import com.simplerapps.phonic.common.FileInfoManager
 import com.simplerapps.phonic.datamodel.AudioConversionInfo
+import com.simplerapps.phonic.utils.LogD
 import java.io.FileDescriptor
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

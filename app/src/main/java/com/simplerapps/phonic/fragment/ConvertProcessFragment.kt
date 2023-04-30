@@ -11,9 +11,12 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.simplerapps.phonic.R
-import com.simplerapps.phonic.convertSecondsToHMmSs
 import com.simplerapps.phonic.databinding.FragmentConvertProcessBinding
-import kotlinx.coroutines.*
+import com.simplerapps.phonic.utils.convertSecondsToHMmSs
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ConvertProcessFragment(private val uri: Uri, private val listener: Listener) :
     Fragment(R.layout.fragment_convert_process), SeekBar.OnSeekBarChangeListener {

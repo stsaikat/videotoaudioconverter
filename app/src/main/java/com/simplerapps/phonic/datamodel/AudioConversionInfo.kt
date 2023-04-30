@@ -1,8 +1,8 @@
 package com.simplerapps.phonic.datamodel
 
 import android.net.Uri
-import com.simplerapps.phonic.TrimRange
 import com.simplerapps.phonic.common.ProgressListener
+import com.simplerapps.phonic.utils.TrimRange
 import kotlin.math.abs
 
 data class AudioConversionInfo(
