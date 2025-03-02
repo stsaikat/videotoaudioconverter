@@ -61,15 +61,15 @@ Follow these steps to get the app up and running:
 
 ## Screenshots
 
-*(Screenshots from the repository will be displayed here.)*
-
-![screenshot_1](https://github.com/stsaikat/videotoaudioconverter/blob/6e3461099f9203171ed2915f42d888c334243cf5/screenshots/screenshot_1.png)
-![screenshot_2](https://github.com/stsaikat/videotoaudioconverter/blob/6e3461099f9203171ed2915f42d888c334243cf5/screenshots/screenshot_2.png)
-![screenshot_3](https://github.com/stsaikat/videotoaudioconverter/blob/6e3461099f9203171ed2915f42d888c334243cf5/screenshots/screenshot_3.png)
-![screenshot_4](https://github.com/stsaikat/videotoaudioconverter/blob/6e3461099f9203171ed2915f42d888c334243cf5/screenshots/screenshot_4.png)
-![screenshot_5](https://github.com/stsaikat/videotoaudioconverter/blob/6e3461099f9203171ed2915f42d888c334243cf5/screenshots/screenshot_5.png)
-![screenshot_6](https://github.com/stsaikat/videotoaudioconverter/blob/6e3461099f9203171ed2915f42d888c334243cf5/screenshots/screenshot_6.png)
-![screenshot_7](https://github.com/stsaikat/videotoaudioconverter/blob/6e3461099f9203171ed2915f42d888c334243cf5/screenshots/screenshot_7.png)
+<p float="left">
+  <img src="screenshots/screenshot_1.png" width="100" />
+  <img src="screenshots/screenshot_2.png" width="100" />
+  <img src="screenshots/screenshot_3.png" width="100" />
+  <img src="screenshots/screenshot_4.png" width="100" />
+  <img src="screenshots/screenshot_5.png" width="100" />
+  <img src="screenshots/screenshot_6.png" width="100" />
+  <img src="screenshots/screenshot_7.png" width="100" />
+</p>
 
 ---
 
